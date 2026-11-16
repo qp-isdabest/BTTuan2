@@ -2,7 +2,7 @@
 **Họ và tên:** Phan Thế Quân  
 **MSSV:** 24110050  
 **Lớp / Môn:** Lập Trình Web - ThS. Nguyễn Hữu Trung  
-**Chủ đề:** Kiến trúc 3 tầng (Three-Tier Architecture), MVC Model 2, Đăng nhập với Mật khẩu mã hóa (BCrypt Hash), Session & Cookie, Đăng ký kích hoạt OTP qua Email, Chức năng Đăng xuất, Công nghệ JPA (Jakarta Persistence 3.1 & Hibernate).
+**Chủ đề:** Kiến trúc 3 tầng (Three-Tier Architecture), MVC Model 2, Đăng nhập với Mật khẩu mã hóa (BCrypt Hash), Quên mật khẩu gửi OTP qua Email, Session & Cookie, Đăng ký kích hoạt OTP qua Email, Chức năng Đăng xuất, Công nghệ JPA (Jakarta Persistence 3.1 & Hibernate).
 
 ---
 
@@ -30,13 +30,15 @@ Dự án tuân thủ nghiêm ngặt mô hình chuẩn theo bài giảng slide:
 │   │   └── impl/
 │   │       └── UserDaoImpl.java                # Triển khai truy vấn dữ liệu bằng JPA (JPQL, EntityManager)
 │   ├── service/                                # TẦNG 2: BUSINESS LOGIC LAYER
-│   │   ├── UserService.java                    # Interface Service định nghĩa logic nghiệp vụ
+│   │   ├── UserService.java                    # Interface Service định nghĩa logic nghiệp vụ (login, register, forgot/reset password)
 │   │   └── impl/
-│   │       └── UserServiceImpl.java            # Triển khai logic xác thực mật khẩu hash, tạo OTP, kiểm tra hạn OTP
+│   │       └── UserServiceImpl.java            # Triển khai logic xác thực mật khẩu hash, tạo OTP, đổi mật khẩu mới
 │   ├── controller/                             # TẦNG 1: PRESENTATION LAYER (Controllers)
 │   │   ├── LoginController.java                # Xử lý đăng nhập với BCrypt, kiểm tra OTP, lưu Session & Cookie
 │   │   ├── RegisterController.java             # Xử lý đăng ký, băm mật khẩu, tạo mã OTP và gửi qua Email
 │   │   ├── VerifyOtpController.java            # Tiếp nhận xác thực OTP (/verify-otp) và gửi lại OTP (/resend-otp)
+│   │   ├── ForgotPasswordController.java       # Xử lý yêu cầu quên mật khẩu (/forgot-password) và gửi lại OTP (/resend-forgot-otp)
+│   │   ├── ResetPasswordController.java        # Xử lý xác nhận OTP và cập nhật mật khẩu mới (/reset-password)
 │   │   ├── WaitingController.java              # Điều hướng người dùng sau khi đăng nhập dựa trên Vai trò (Role)
 │   │   ├── HomeController.java                 # Trang chủ hiển thị thông tin Session & Cookie của User
 │   │   ├── AdminHomeController.java            # Bảng điều khiển Admin xem toàn bộ danh sách User & Trạng thái OTP
@@ -50,9 +52,11 @@ Dự án tuân thủ nghiêm ngặt mô hình chuẩn theo bài giảng slide:
     │   ├── web.xml                             # Deployment Descriptor
     │   └── views/                              # TẦNG 1: PRESENTATION LAYER (Views)
     │       ├── topbar.jsp                      # Header / Thanh điều hướng dùng chung
-    │       ├── login.jsp                       # Giao diện Đăng nhập (hỗ trợ Remember Me, thông báo Logout)
+    │       ├── login.jsp                       # Giao diện Đăng nhập (Remember Me, link Quên mật khẩu)
     │       ├── register.jsp                    # Giao diện Đăng ký tài khoản
     │       ├── verify_otp.jsp                  # Giao diện nhập mã OTP 6 số để kích hoạt tài khoản
+    │       ├── forgot_password.jsp             # Giao diện yêu cầu khôi phục mật khẩu (nhập email/username)
+    │       ├── reset_password.jsp              # Giao diện nhập OTP và thiết lập mật khẩu mới
     │       ├── home.jsp                        # Giao diện Trang chủ người dùng (User & Manager)
     │       └── admin_home.jsp                  # Giao diện Trang quản trị Admin (hiển thị cột Trạng thái OTP)
     └── index.jsp                               # Trang gốc chuyển hướng sang /waiting
@@ -62,25 +66,30 @@ Dự án tuân thủ nghiêm ngặt mô hình chuẩn theo bài giảng slide:
 
 ## 2. Các tính năng cốt lõi
 
-### 1. Đăng nhập với mật khẩu được mã hóa (BCrypt Hash)
+### 1. Quên mật khẩu gửi mã xác nhận OTP qua Email
+* **Gửi yêu cầu:** Người dùng nhấn *"Quên mật khẩu?"* tại trang đăng nhập $\rightarrow$ Chuyển đến `/forgot-password` $\rightarrow$ Nhập Email hoặc Tên đăng nhập.
+* **Xác thực tồn tại & Sinh OTP:** Hệ thống kiểm tra tài khoản trong CSDL qua JPA $\rightarrow$ Sinh ngẫu nhiên mã OTP 6 chữ số có hiệu lực trong **5 phút** $\rightarrow$ Lưu vào CSDL $\rightarrow$ Gửi email chứa mã OTP đến hòm thư người dùng.
+* **Đặt lại mật khẩu mới:** Người dùng được chuyển đến `/reset-password` $\rightarrow$ Nhập mã OTP + Mật khẩu mới + Xác nhận mật khẩu mới.
+* **Băm mật khẩu:** Sau khi kiểm tra OTP chính xác và còn hạn, mật khẩu mới được băm bằng **BCrypt** an toàn và lưu vào CSDL $\rightarrow$ Điều hướng về `/login` với thông báo thành công.
+* **Hỗ trợ thử nghiệm:** Có tính năng gửi lại mã OTP (`/resend-forgot-otp`) và hiển thị gợi ý Dev Mode trên giao diện giúp việc chấm bài không bị phụ thuộc vào mạng SMTP ngoài.
+
+### 2. Đăng nhập với mật khẩu được mã hóa (BCrypt Hash)
 * Hệ thống sử dụng thư viện **jBCrypt** với thuật toán băm kèm muối ngẫu nhiên (`gensalt(12)`).
 * Mật khẩu người dùng khi đăng ký hoặc khởi tạo mẫu không bao giờ lưu dưới dạng văn bản thô (plain-text) trong CSDL, mà luôn lưu chuỗi hash dạng `$2a$12$...`.
 * Khi đăng nhập, hàm `PasswordUtil.checkPassword(plainPassword, hashedPassword)` so sánh mật khẩu người dùng nhập vào với chuỗi hash trong CSDL để đảm bảo an toàn tuyệt đối.
 
-### 2. Chức năng Đăng xuất (Logout)
+### 3. Chức năng Đăng xuất (Logout)
 * Xử lý qua Servlet [LogoutController.java](file:///d:/Study/2026-2027/HK1/DOT2/WEB/BTTuan2/24110050_PhanTheQuan_Week2/src/main/java/vn/iotstar/controller/LogoutController.java) (`/logout`), hỗ trợ cả phương thức `GET` và `POST`.
 * Hủy toàn bộ phiên làm việc của người dùng (`session.invalidate()`).
 * Xóa sạch Cookie ghi nhớ đăng nhập `username` (`cookie.setMaxAge(0)`) trên cả context path và root path.
 * Chuyển hướng người dùng về trang đăng nhập `/login?logout=1` và hiển thị thông báo: *"Bạn đã đăng xuất khỏi hệ thống thành công!"*.
-* Sau khi đăng xuất, mọi nỗ lực truy cập vào các trang bảo vệ (`/home`, `/admin/home`) đều bị chặn và tự động đưa về `/login`.
 
-### 3. Đăng ký & Kích hoạt qua OTP Email
+### 4. Đăng ký & Kích hoạt qua OTP Email
 * Khi đăng ký, mật khẩu được băm BCrypt và lưu tài khoản với trạng thái `status = 0`.
 * Sinh mã OTP 6 chữ số có hiệu lực trong **5 phút** gửi tới email người dùng.
 * Người dùng chỉ có thể đăng nhập sau khi xác thực OTP thành công trên trang `/verify-otp`.
-* Có hỗ trợ nút **"Gửi lại mã OTP"** (`/resend-otp`) và chế độ Dev Mode hiển thị OTP để chấm bài tiện lợi.
 
-### 4. Đăng nhập bằng Session & Cookie
+### 5. Đăng nhập bằng Session & Cookie
 * Quản lý trạng thái đăng nhập qua `HttpSession` (`account`, `username`).
 * Checkbox **"Ghi nhớ tôi (Lưu Cookie)"** tạo Cookie `username` tồn tại trong 30 phút, giúp tự động nhận diện tài khoản khi truy cập lại.
 
@@ -89,11 +98,11 @@ Dự án tuân thủ nghiêm ngặt mô hình chuẩn theo bài giảng slide:
 ## 3. Tài khoản thử nghiệm mặc định
 
 Mật khẩu ban đầu của các tài khoản mẫu đều là `123456`, đã được tự động băm BCrypt khi nạp vào CSDL:
-| Tên đăng nhập | Mật khẩu thô | Chuỗi lưu trong DB | Quyền (Role) | Trang sau đăng nhập |
-|---------------|--------------|--------------------|--------------|---------------------|
-| `admin`       | `123456`     | `$2a$12$...` (Hash)| 1 - Admin    | `/admin/home`       |
-| `manager`     | `123456`     | `$2a$12$...` (Hash)| 2 - Manager  | `/home`             |
-| `user`        | `123456`     | `$2a$12$...` (Hash)| 3 - User     | `/home`             |
+| Tên đăng nhập | Email | Mật khẩu thô | Quyền (Role) | Trang sau đăng nhập |
+|---------------|-------|--------------|--------------|---------------------|
+| `admin`       | `admin@iotstar.vn` | `123456`     | 1 - Admin    | `/admin/home`       |
+| `manager`     | `manager@iotstar.vn` | `123456`   | 2 - Manager  | `/home`             |
+| `user`        | `user@iotstar.vn` | `123456`      | 3 - User     | `/home`             |
 
 ---
 

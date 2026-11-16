@@ -11,6 +11,8 @@ public interface UserService {
 
     User findByEmail(String email);
 
+    User findByUsernameOrEmail(String identifier);
+
     void insert(User user);
 
     void update(User user);
@@ -22,6 +24,10 @@ public interface UserService {
     int verifyOtp(String email, String otp); // 1: Thành công, 0: Sai mã OTP, -1: OTP đã hết hạn, -2: Không tìm thấy user
 
     String resendOtp(String email);
+
+    String sendForgotPasswordOtp(String identifier); // Trả về OTP nếu thành công, null nếu không tìm thấy tài khoản
+
+    int resetPassword(String email, String otp, String newPassword); // 1: Thành công, 0: Sai OTP, -1: Hết hạn, -2: Không tìm thấy
 
     boolean checkExistEmail(String email);
 

@@ -99,7 +99,7 @@
                             Ghi nhớ tôi (Lưu Cookie)
                         </label>
                     </div>
-                    <a href="#" class="text-decoration-none small text-muted">Quên mật khẩu?</a>
+                    <a href="${pageContext.request.contextPath}/forgot-password" class="text-decoration-none small text-primary fw-semibold">Quên mật khẩu?</a>
                 </div>
 
                 <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">

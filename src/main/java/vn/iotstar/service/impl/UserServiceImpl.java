@@ -53,6 +53,28 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User findByUsernameOrEmail(String identifier) {
+        if (identifier == null || identifier.trim().isEmpty()) {
+            return null;
+        }
+        String clean = identifier.trim();
+        // Nếu chứa ký tự '@' thì ưu tiên tìm theo Email trước
+        if (clean.contains("@")) {
+            User user = userDao.findByEmail(clean);
+            if (user != null) {
+                return user;
+            }
+        }
+        // Thử tìm theo Username
+        User user = userDao.get(clean);
+        if (user != null) {
+            return user;
+        }
+        // Thử tìm theo Email nếu clean không có '@'
+        return userDao.findByEmail(clean);
+    }
+
+    @Override
     public void insert(User user) {
         userDao.insert(user);
     }
@@ -143,6 +165,58 @@ public class UserServiceImpl implements UserService {
         EmailUtil.sendOtpEmail(user.getEmail(), user.getFullName(), newOtp);
 
         return newOtp;
+    }
+
+    @Override
+    public String sendForgotPasswordOtp(String identifier) {
+        User user = findByUsernameOrEmail(identifier);
+        if (user == null) {
+            return null;
+        }
+
+        // Sinh mã OTP 6 số
+        String otp = String.format("%06d", new Random().nextInt(1000000));
+        long expiry = System.currentTimeMillis() + 5 * 60 * 1000; // 5 phút
+
+        user.setOtp(otp);
+        user.setOtpExpiry(expiry);
+        userDao.update(user);
+
+        // Gửi email OTP khôi phục mật khẩu
+        EmailUtil.sendForgotPasswordOtpEmail(user.getEmail(), user.getFullName(), otp);
+
+        return otp;
+    }
+
+    @Override
+    public int resetPassword(String email, String otp, String newPassword) {
+        if (email == null || otp == null || newPassword == null || newPassword.trim().isEmpty()) {
+            return -2;
+        }
+        User user = userDao.findByEmail(email.trim());
+        if (user == null) {
+            return -2; // Tài khoản không tồn tại
+        }
+
+        // Kiểm tra hết hạn OTP
+        if (user.getOtpExpiry() != null && System.currentTimeMillis() > user.getOtpExpiry()) {
+            return -1; // OTP đã hết hạn
+        }
+
+        // Kiểm tra mã OTP khớp
+        if (user.getOtp() == null || !user.getOtp().equals(otp.trim())) {
+            return 0; // Sai mã OTP
+        }
+
+        // Băm mật khẩu mới bằng BCrypt và cập nhật
+        String hashedPassword = PasswordUtil.hashPassword(newPassword.trim());
+        user.setPassWord(hashedPassword);
+        user.setOtp(null);
+        user.setOtpExpiry(null);
+        user.setStatus(1); // Kích hoạt luôn nếu trước đó chưa kích hoạt
+        userDao.update(user);
+
+        return 1; // Thành công
     }
 
     @Override
