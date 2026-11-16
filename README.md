@@ -33,14 +33,14 @@ Dự án tuân thủ nghiêm ngặt mô hình chuẩn theo bài giảng slide:
 │   │   ├── UserService.java & UserServiceImpl  # Service nghiệp vụ người dùng, xác thực, OTP
 │   │   └── VideoService.java & VideoServiceImpl# Service nghiệp vụ Video (CRUD logic)
 │   ├── controller/                             # TẦNG 1: PRESENTATION LAYER (Controllers)
-│   │   ├── VideoController.java                # Xử lý toàn bộ CRUD Video (/videos, /video/add, /video/edit, /video/delete)
+│   │   ├── VideoController.java                # Xử lý CRUD Video & Phân trang 6sp/trang (/video, /videos, /video/add, /video/edit, /video/delete)
 │   │   ├── LoginController.java                # Xử lý đăng nhập với BCrypt, kiểm tra OTP, lưu Session & Cookie
 │   │   ├── RegisterController.java             # Xử lý đăng ký, băm mật khẩu, tạo mã OTP và gửi qua Email
 │   │   ├── VerifyOtpController.java            # Tiếp nhận xác thực OTP (/verify-otp) và gửi lại OTP (/resend-otp)
 │   │   ├── ForgotPasswordController.java       # Xử lý yêu cầu quên mật khẩu (/forgot-password)
 │   │   ├── ResetPasswordController.java        # Xử lý xác nhận OTP và cập nhật mật khẩu mới (/reset-password)
 │   │   ├── WaitingController.java              # Điều hướng người dùng sau khi đăng nhập dựa trên Vai trò (Role)
-│   │   ├── HomeController.java                 # Trang chủ hiển thị thông tin Session, Cookie và Video của User
+│   │   ├── HomeController.java                 # Trang chủ hiển thị 10 video mới nhất, thông tin Session, Cookie
 │   │   ├── AdminHomeController.java            # Bảng điều khiển Admin xem toàn bộ User & Bảng Videos
 │   │   └── LogoutController.java               # Hủy Session, xóa Cookie Remember-Me ở mọi Path
 │   └── util/
@@ -93,8 +93,20 @@ Dự án tuân thủ nghiêm ngặt mô hình chuẩn theo bài giảng slide:
 Mật khẩu ban đầu của các tài khoản mẫu đều là `123456`, đã được tự động băm BCrypt:
 | Tên đăng nhập | Email | Mật khẩu thô | Quyền (Role) | Dữ liệu Video khởi tạo |
 |---------------|-------|--------------|--------------|------------------------|
-| `admin`       | `admin@iotstar.vn` | `123456` | 1 - Admin | 2 videos (Bài giảng MVC, JPA) |
-| `user`        | `user@iotstar.vn` | `123456` | 3 - User | 1 video (Báo cáo Tuần 2) |
+| `admin`       | `admin@iotstar.vn` | `123456` | 1 - Admin | 5 videos hệ thống |
+| `manager`     | `manager@iotstar.vn` | `123456` | 2 - Manager | 3 videos quản lý |
+| `user`        | `user@iotstar.vn` | `123456` | 3 - User | 8 videos (Phân trang 6sp/trang: Trang 1 có 6, Trang 2 có 2) |
+
+---
+
+## 5. Danh sách các URL chính của ứng dụng
+- **Trang chủ (10 video mới nhất):** [http://localhost:8080/Week2/home](http://localhost:8080/Week2/home)
+- **Tất cả videos của user (Phân trang 6sp/trang):** [http://localhost:8080/Week2/video](http://localhost:8080/Week2/video)
+- **Đăng nhập (Session & Cookie):** [http://localhost:8080/Week2/login](http://localhost:8080/Week2/login)
+- **Đăng ký (Kích hoạt OTP Email):** [http://localhost:8080/Week2/register](http://localhost:8080/Week2/register)
+- **Quên mật khẩu (OTP Email):** [http://localhost:8080/Week2/forgot-password](http://localhost:8080/Week2/forgot-password)
+- **Thêm video mới:** [http://localhost:8080/Week2/video/add](http://localhost:8080/Week2/video/add)
+- **Bảng điều khiển Quản trị (Admin):** [http://localhost:8080/Week2/admin/home](http://localhost:8080/Week2/admin/home)
 
 ---
 

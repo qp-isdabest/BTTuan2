@@ -22,4 +22,21 @@ public interface VideoService {
     List<Video> findLatestVideos(int limit);
 
     List<Video> findTop10LatestVideos();
+
+    // Phân trang (Pagination)
+    List<Video> findAll(int page, int pageSize);
+
+    long countAll();
+
+    List<Video> findByUserId(int userId, int page, int pageSize);
+
+    long countByUserId(int userId);
+
+    List<Video> searchByTitle(String keyword, int page, int pageSize);
+
+    long countByTitle(String keyword);
+
+    List<Video> searchByTitleAndUserId(String keyword, int userId, int page, int pageSize);
+
+    long countByTitleAndUserId(String keyword, int userId);
 }

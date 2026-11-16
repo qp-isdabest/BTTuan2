@@ -138,8 +138,8 @@
             </h5>
             <div>
                 <span class="badge bg-danger">${latestVideos.size()} videos mới</span>
-                <a href="${pageContext.request.contextPath}/videos" class="btn btn-sm btn-outline-primary ms-2">
-                    <i class="bi bi-grid me-1"></i>Xem tất cả
+                <a href="${pageContext.request.contextPath}/video" class="btn btn-sm btn-outline-primary ms-2">
+                    <i class="bi bi-grid me-1"></i>Xem tất cả (6sp/trang)
                 </a>
             </div>
         </div>

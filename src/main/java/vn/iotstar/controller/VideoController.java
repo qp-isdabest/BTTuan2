@@ -15,10 +15,11 @@ import vn.iotstar.util.Constant;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet(urlPatterns = {"/videos", "/video/add", "/video/edit", "/video/delete"})
+@WebServlet(urlPatterns = {"/video", "/videos", "/video/add", "/video/edit", "/video/delete"})
 public class VideoController extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
+    private static final int PAGE_SIZE = 6; // Phân trang 6 video (6 sản phẩm) / trang theo yêu cầu
     private final VideoService videoService = new VideoServiceImpl();
 
     @Override
@@ -37,6 +38,7 @@ public class VideoController extends HttpServlet {
             case "/video/delete":
                 processDelete(req, resp);
                 break;
+            case "/video":
             case "/videos":
             default:
                 listVideos(req, resp);
@@ -59,24 +61,97 @@ public class VideoController extends HttpServlet {
         } else if ("/video/delete".equals(path)) {
             processDelete(req, resp);
         } else {
-            resp.sendRedirect(req.getContextPath() + "/videos");
+            resp.sendRedirect(req.getContextPath() + "/video");
         }
     }
 
-    // 1. READ: Hiển thị danh sách Video (có hỗ trợ tìm kiếm theo tiêu đề)
+    // 1. READ: Hiển thị danh sách Video của user và phân trang 6 sản phẩm/trang trên URL /video
     private void listVideos(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        String keyword = req.getParameter("keyword");
-        List<Video> videos;
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            videos = videoService.searchByTitle(keyword.trim());
-            req.setAttribute("keyword", keyword.trim());
-        } else {
-            videos = videoService.findAll();
+        HttpSession session = req.getSession(false);
+        User currentUser = (session != null) ? (User) session.getAttribute(Constant.SESSION_ACCOUNT) : null;
+
+        // 1. Lấy trang hiện tại (page)
+        int page = 1;
+        String pageStr = req.getParameter("page");
+        if (pageStr != null && !pageStr.trim().isEmpty()) {
+            try {
+                page = Integer.parseInt(pageStr.trim());
+                if (page < 1) page = 1;
+            } catch (NumberFormatException e) {
+                page = 1;
+            }
         }
 
+        // 2. Lấy từ khóa tìm kiếm (keyword)
+        String keyword = req.getParameter("keyword");
+        if (keyword != null) {
+            keyword = keyword.trim();
+        }
+
+        // 3. Xác định chế độ hiển thị:
+        // filter = "my" (chỉ video của user hiện tại) hoặc "all" (toàn bộ video hệ thống)
+        // Nếu user đã đăng nhập và không truyền filter -> mặc định hiển thị "my" (videos của user)
+        String filter = req.getParameter("filter");
+        if (filter == null || filter.trim().isEmpty()) {
+            if (currentUser != null) {
+                filter = "my"; // Ưu tiên hiển thị video của user theo yêu cầu đề bài
+            } else {
+                filter = "all";
+            }
+        }
+
+        // Hỗ trợ thêm tham số userId tùy chọn để xem video của một user cụ thể
+        String userIdStr = req.getParameter("userId");
+        Integer targetUserId = null;
+        if (userIdStr != null && !userIdStr.trim().isEmpty()) {
+            try {
+                targetUserId = Integer.parseInt(userIdStr.trim());
+            } catch (NumberFormatException ignored) {}
+        }
+
+        List<Video> videos;
+        long totalVideos = 0;
+
+        if (targetUserId != null) {
+            totalVideos = videoService.countByTitleAndUserId(keyword, targetUserId);
+            videos = videoService.searchByTitleAndUserId(keyword, targetUserId, page, PAGE_SIZE);
+        } else if ("my".equalsIgnoreCase(filter) && currentUser != null) {
+            totalVideos = videoService.countByTitleAndUserId(keyword, currentUser.getId());
+            videos = videoService.searchByTitleAndUserId(keyword, currentUser.getId(), page, PAGE_SIZE);
+        } else {
+            filter = "all";
+            totalVideos = videoService.countByTitle(keyword);
+            videos = videoService.searchByTitle(keyword, page, PAGE_SIZE);
+        }
+
+        // Tính tổng số trang
+        int totalPages = (int) Math.ceil((double) totalVideos / PAGE_SIZE);
+        if (totalPages == 0) {
+            totalPages = 1;
+        }
+        if (page > totalPages) {
+            page = totalPages;
+        }
+
+        // Số lượng video của riêng user và của toàn hệ thống (để hiển thị badge trên tab)
+        if (currentUser != null) {
+            long myCount = videoService.countByUserId(currentUser.getId());
+            req.setAttribute("myVideoCount", myCount);
+        }
+        long allCount = videoService.countAll();
+        req.setAttribute("allVideoCount", allCount);
+
         req.setAttribute("videos", videos);
+        req.setAttribute("currentPage", page);
+        req.setAttribute("totalPages", totalPages);
+        req.setAttribute("totalVideos", totalVideos);
+        req.setAttribute("pageSize", PAGE_SIZE);
+        req.setAttribute("filter", filter);
+        req.setAttribute("keyword", keyword);
+        req.setAttribute("targetUserId", targetUserId);
+
         req.getRequestDispatcher(Constant.Path.VIDEO_LIST).forward(req, resp);
     }
 
@@ -131,7 +206,7 @@ public class VideoController extends HttpServlet {
         );
 
         videoService.insert(newVideo);
-        resp.sendRedirect(req.getContextPath() + "/videos?msg=add_success");
+        resp.sendRedirect(req.getContextPath() + "/video?msg=add_success");
     }
 
     // 3. UPDATE (Form): Hiển thị form chỉnh sửa video
@@ -146,7 +221,7 @@ public class VideoController extends HttpServlet {
 
         String idStr = req.getParameter("id");
         if (idStr == null || idStr.trim().isEmpty()) {
-            resp.sendRedirect(req.getContextPath() + "/videos");
+            resp.sendRedirect(req.getContextPath() + "/video");
             return;
         }
 
@@ -154,7 +229,7 @@ public class VideoController extends HttpServlet {
             int videoId = Integer.parseInt(idStr);
             Video video = videoService.findById(videoId);
             if (video == null) {
-                resp.sendRedirect(req.getContextPath() + "/videos");
+                resp.sendRedirect(req.getContextPath() + "/video");
                 return;
             }
 
@@ -162,7 +237,7 @@ public class VideoController extends HttpServlet {
             req.setAttribute("isEdit", true);
             req.getRequestDispatcher(Constant.Path.VIDEO_FORM).forward(req, resp);
         } catch (NumberFormatException e) {
-            resp.sendRedirect(req.getContextPath() + "/videos");
+            resp.sendRedirect(req.getContextPath() + "/video");
         }
     }
 
@@ -198,10 +273,10 @@ public class VideoController extends HttpServlet {
 
                 videoService.update(video);
             }
-            resp.sendRedirect(req.getContextPath() + "/videos?msg=edit_success");
+            resp.sendRedirect(req.getContextPath() + "/video?msg=edit_success");
         } catch (Exception e) {
             e.printStackTrace();
-            resp.sendRedirect(req.getContextPath() + "/videos?msg=error");
+            resp.sendRedirect(req.getContextPath() + "/video?msg=error");
         }
     }
 
@@ -220,12 +295,12 @@ public class VideoController extends HttpServlet {
             try {
                 int videoId = Integer.parseInt(idStr);
                 videoService.delete(videoId);
-                resp.sendRedirect(req.getContextPath() + "/videos?msg=delete_success");
+                resp.sendRedirect(req.getContextPath() + "/video?msg=delete_success");
                 return;
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        resp.sendRedirect(req.getContextPath() + "/videos");
+        resp.sendRedirect(req.getContextPath() + "/video");
     }
 }

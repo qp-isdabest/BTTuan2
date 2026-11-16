@@ -142,4 +142,139 @@ public class VideoDaoImpl implements VideoDao {
             em.close();
         }
     }
+
+    @Override
+    public List<Video> findAll(int page, int pageSize) {
+        EntityManager em = JpaConfig.getEntityManager();
+        try {
+            String jpql = "SELECT v FROM Video v JOIN FETCH v.user ORDER BY v.videoId DESC";
+            return em.createQuery(jpql, Video.class)
+                    .setFirstResult((page - 1) * pageSize)
+                    .setMaxResults(pageSize)
+                    .getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return List.of();
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public long countAll() {
+        EntityManager em = JpaConfig.getEntityManager();
+        try {
+            String jpql = "SELECT COUNT(v) FROM Video v";
+            return em.createQuery(jpql, Long.class).getSingleResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0L;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public List<Video> findByUserId(int userId, int page, int pageSize) {
+        EntityManager em = JpaConfig.getEntityManager();
+        try {
+            String jpql = "SELECT v FROM Video v JOIN FETCH v.user WHERE v.user.id = :userId ORDER BY v.videoId DESC";
+            return em.createQuery(jpql, Video.class)
+                    .setParameter("userId", userId)
+                    .setFirstResult((page - 1) * pageSize)
+                    .setMaxResults(pageSize)
+                    .getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return List.of();
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public long countByUserId(int userId) {
+        EntityManager em = JpaConfig.getEntityManager();
+        try {
+            String jpql = "SELECT COUNT(v) FROM Video v WHERE v.user.id = :userId";
+            return em.createQuery(jpql, Long.class)
+                    .setParameter("userId", userId)
+                    .getSingleResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0L;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public List<Video> searchByTitle(String keyword, int page, int pageSize) {
+        EntityManager em = JpaConfig.getEntityManager();
+        try {
+            String jpql = "SELECT v FROM Video v JOIN FETCH v.user WHERE LOWER(v.title) LIKE LOWER(:keyword) ORDER BY v.videoId DESC";
+            return em.createQuery(jpql, Video.class)
+                    .setParameter("keyword", "%" + keyword + "%")
+                    .setFirstResult((page - 1) * pageSize)
+                    .setMaxResults(pageSize)
+                    .getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return List.of();
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public long countByTitle(String keyword) {
+        EntityManager em = JpaConfig.getEntityManager();
+        try {
+            String jpql = "SELECT COUNT(v) FROM Video v WHERE LOWER(v.title) LIKE LOWER(:keyword)";
+            return em.createQuery(jpql, Long.class)
+                    .setParameter("keyword", "%" + keyword + "%")
+                    .getSingleResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0L;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public List<Video> searchByTitleAndUserId(String keyword, int userId, int page, int pageSize) {
+        EntityManager em = JpaConfig.getEntityManager();
+        try {
+            String jpql = "SELECT v FROM Video v JOIN FETCH v.user WHERE v.user.id = :userId AND LOWER(v.title) LIKE LOWER(:keyword) ORDER BY v.videoId DESC";
+            return em.createQuery(jpql, Video.class)
+                    .setParameter("userId", userId)
+                    .setParameter("keyword", "%" + keyword + "%")
+                    .setFirstResult((page - 1) * pageSize)
+                    .setMaxResults(pageSize)
+                    .getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return List.of();
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public long countByTitleAndUserId(String keyword, int userId) {
+        EntityManager em = JpaConfig.getEntityManager();
+        try {
+            String jpql = "SELECT COUNT(v) FROM Video v WHERE v.user.id = :userId AND LOWER(v.title) LIKE LOWER(:keyword)";
+            return em.createQuery(jpql, Long.class)
+                    .setParameter("userId", userId)
+                    .setParameter("keyword", "%" + keyword + "%")
+                    .getSingleResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0L;
+        } finally {
+            em.close();
+        }
+    }
 }

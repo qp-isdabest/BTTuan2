@@ -16,8 +16,8 @@
                     <a class="nav-link" href="${pageContext.request.contextPath}/home">Trang chủ</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="${pageContext.request.contextPath}/videos">
-                        <i class="bi bi-camera-reels me-1"></i>Quản lý Videos
+                    <a class="nav-link" href="${pageContext.request.contextPath}/video">
+                        <i class="bi bi-camera-reels me-1"></i>Videos (6sp/trang)
                     </a>
                 </li>
                 <c:if test="${sessionScope.account != null && sessionScope.account.roleid == 1}">
