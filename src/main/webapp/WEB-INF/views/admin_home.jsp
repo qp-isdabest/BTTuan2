@@ -61,6 +61,7 @@
                         <th scope="col">Email</th>
                         <th scope="col">Số điện thoại</th>
                         <th scope="col" class="text-center">Vai trò (Role)</th>
+                        <th scope="col" class="text-center">Trạng thái (OTP)</th>
                         <th scope="col" class="text-center">Ngày tạo</th>
                     </tr>
                 </thead>
@@ -86,6 +87,20 @@
                                     </c:when>
                                     <c:otherwise>
                                         <span class="badge bg-success px-2 py-1">User (3)</span>
+                                    </c:otherwise>
+                                </c:choose>
+                            </td>
+                            <td class="text-center">
+                                <c:choose>
+                                    <c:when test="${u.status == 1}">
+                                        <span class="badge bg-success-subtle text-success border border-success px-2 py-1">
+                                            <i class="bi bi-check-circle me-1"></i>Đã kích hoạt
+                                        </span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning px-2 py-1">
+                                            <i class="bi bi-clock-history me-1"></i>Chờ OTP
+                                        </span>
                                     </c:otherwise>
                                 </c:choose>
                             </td>

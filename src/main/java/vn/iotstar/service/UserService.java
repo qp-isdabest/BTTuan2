@@ -9,9 +9,19 @@ public interface UserService {
 
     User get(String username);
 
+    User findByEmail(String email);
+
     void insert(User user);
 
+    void update(User user);
+
     boolean register(String username, String password, String email, String fullname, String phone);
+
+    boolean registerWithOtp(String username, String password, String email, String fullname, String phone, String otp, long otpExpiry);
+
+    int verifyOtp(String email, String otp); // 1: Thành công, 0: Sai mã OTP, -1: OTP đã hết hạn, -2: Không tìm thấy user
+
+    String resendOtp(String email);
 
     boolean checkExistEmail(String email);
 
@@ -21,4 +31,3 @@ public interface UserService {
 
     List<User> findAll();
 }
-

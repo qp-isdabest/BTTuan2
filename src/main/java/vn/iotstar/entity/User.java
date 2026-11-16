@@ -38,6 +38,15 @@ public class User implements Serializable {
     @Column(name = "created_date")
     private Date createdDate;
 
+    @Column(name = "status", nullable = false)
+    private int status = 1; // 1: Đã kích hoạt, 0: Chưa kích hoạt (chờ OTP)
+
+    @Column(name = "otp", length = 10)
+    private String otp;
+
+    @Column(name = "otp_expiry")
+    private Long otpExpiry; // Thời gian hết hạn OTP (epoch milliseconds)
+
     public User() {
     }
 
@@ -50,6 +59,21 @@ public class User implements Serializable {
         this.roleid = roleid;
         this.phone = phone;
         this.createdDate = createdDate;
+        this.status = 1;
+    }
+
+    public User(String email, String userName, String fullName, String passWord, String avatar, int roleid, String phone, Date createdDate, int status, String otp, Long otpExpiry) {
+        this.email = email;
+        this.userName = userName;
+        this.fullName = fullName;
+        this.passWord = passWord;
+        this.avatar = avatar;
+        this.roleid = roleid;
+        this.phone = phone;
+        this.createdDate = createdDate;
+        this.status = status;
+        this.otp = otp;
+        this.otpExpiry = otpExpiry;
     }
 
     public int getId() {
@@ -124,6 +148,30 @@ public class User implements Serializable {
         this.createdDate = createdDate;
     }
 
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public String getOtp() {
+        return otp;
+    }
+
+    public void setOtp(String otp) {
+        this.otp = otp;
+    }
+
+    public Long getOtpExpiry() {
+        return otpExpiry;
+    }
+
+    public void setOtpExpiry(Long otpExpiry) {
+        this.otpExpiry = otpExpiry;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -134,7 +182,7 @@ public class User implements Serializable {
                 ", roleid=" + roleid +
                 ", phone='" + phone + '\'' +
                 ", createdDate=" + createdDate +
+                ", status=" + status +
                 '}';
     }
 }
-

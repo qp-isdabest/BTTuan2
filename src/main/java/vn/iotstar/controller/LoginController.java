@@ -39,7 +39,7 @@ public class LoginController extends HttpServlet {
                     String username = cookie.getValue();
                     if (username != null && !username.trim().isEmpty()) {
                         User user = userService.get(username);
-                        if (user != null) {
+                        if (user != null && user.getStatus() == 1) {
                             session = req.getSession(true);
                             session.setAttribute(Constant.SESSION_ACCOUNT, user);
                             session.setAttribute(Constant.SESSION_USERNAME, user.getUserName());
@@ -80,6 +80,16 @@ public class LoginController extends HttpServlet {
         User user = userService.login(username.trim(), password.trim());
 
         if (user != null) {
+            // Kiểm tra trạng thái kích hoạt tài khoản qua OTP
+            if (user.getStatus() == 0) {
+                alertMsg = "Tài khoản của bạn chưa được kích hoạt qua mã OTP!";
+                req.setAttribute("alert", alertMsg);
+                req.setAttribute("pendingEmail", user.getEmail());
+                req.setAttribute("username", username);
+                req.getRequestDispatcher(Constant.Path.LOGIN).forward(req, resp);
+                return;
+            }
+
             // Đăng nhập thành công -> lưu phiên vào HttpSession
             HttpSession session = req.getSession(true);
             session.setAttribute(Constant.SESSION_ACCOUNT, user);

@@ -53,6 +53,13 @@
             <c:if test="${alert != null}">
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     <i class="bi bi-exclamation-triangle-fill me-2"></i>${alert}
+                    <c:if test="${pendingEmail != null}">
+                        <div class="mt-2">
+                            <a href="${pageContext.request.contextPath}/verify-otp?email=${pendingEmail}" class="btn btn-sm btn-outline-danger fw-semibold">
+                                <i class="bi bi-shield-check me-1"></i>Nhập mã OTP kích hoạt ngay
+                            </a>
+                        </div>
+                    </c:if>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             </c:if>

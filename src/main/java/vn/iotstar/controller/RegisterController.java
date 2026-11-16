@@ -11,8 +11,12 @@ import vn.iotstar.entity.User;
 import vn.iotstar.service.UserService;
 import vn.iotstar.service.impl.UserServiceImpl;
 import vn.iotstar.util.Constant;
+import vn.iotstar.util.EmailUtil;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Random;
 
 @WebServlet(urlPatterns = "/register")
 public class RegisterController extends HttpServlet {
@@ -115,17 +119,31 @@ public class RegisterController extends HttpServlet {
             return;
         }
 
-        boolean isSuccess = userService.register(
+        // Sinh mã OTP 6 số ngẫu nhiên
+        String otp = String.format("%06d", new Random().nextInt(1000000));
+        long otpExpiry = System.currentTimeMillis() + 5 * 60 * 1000; // Hết hạn sau 5 phút
+
+        boolean isSuccess = userService.registerWithOtp(
                 username.trim(),
                 password.trim(),
                 email.trim(),
                 fullname.trim(),
-                phone != null ? phone.trim() : ""
+                phone != null ? phone.trim() : "",
+                otp,
+                otpExpiry
         );
 
         if (isSuccess) {
-            req.setAttribute("successMsg", "Đăng ký tài khoản thành công! Vui lòng đăng nhập.");
-            req.getRequestDispatcher(Constant.Path.LOGIN).forward(req, resp);
+            // Gửi OTP qua email
+            EmailUtil.sendOtpEmail(email.trim(), fullname.trim(), otp);
+
+            // Lưu thông tin tạm để hỗ trợ kiểm thử tiện lợi
+            HttpSession session = req.getSession(true);
+            session.setAttribute("otpEmail", email.trim());
+            session.setAttribute("devOtp", otp); // Hỗ trợ hiển thị trên UI khi chưa cài đặt SMTP thật
+
+            String encodedEmail = URLEncoder.encode(email.trim(), StandardCharsets.UTF_8);
+            resp.sendRedirect(req.getContextPath() + "/verify-otp?email=" + encodedEmail);
         } else {
             alertMsg = "Lỗi hệ thống khi đăng ký tài khoản!";
             req.setAttribute("alert", alertMsg);
@@ -133,4 +151,3 @@ public class RegisterController extends HttpServlet {
         }
     }
 }
-

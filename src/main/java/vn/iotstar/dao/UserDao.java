@@ -7,6 +7,8 @@ public interface UserDao {
 
     User get(String username);
 
+    User findByEmail(String email);
+
     void insert(User user);
 
     void update(User user);
@@ -19,4 +21,3 @@ public interface UserDao {
 
     List<User> findAll();
 }
-
