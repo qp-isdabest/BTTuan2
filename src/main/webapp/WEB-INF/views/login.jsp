@@ -72,6 +72,14 @@
                 </div>
             </c:if>
 
+            <!-- Thông báo đăng xuất thành công -->
+            <c:if test="${param.logout != null}">
+                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    <i class="bi bi-box-arrow-right me-2"></i>Bạn đã đăng xuất khỏi hệ thống thành công!
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            </c:if>
+
             <form action="${pageContext.request.contextPath}/login" method="post">
                 <div class="input-group mb-3">
                     <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>

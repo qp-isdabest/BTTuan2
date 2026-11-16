@@ -5,6 +5,7 @@ import vn.iotstar.dao.impl.UserDaoImpl;
 import vn.iotstar.entity.User;
 import vn.iotstar.service.UserService;
 import vn.iotstar.util.EmailUtil;
+import vn.iotstar.util.PasswordUtil;
 
 import java.sql.Date;
 import java.util.List;
@@ -28,7 +29,8 @@ public class UserServiceImpl implements UserService {
             return null;
         }
         User user = this.get(username.trim());
-        if (user != null && password.equals(user.getPassWord())) {
+        // Xác thực mật khẩu với chuỗi hash BCrypt trong CSDL
+        if (user != null && PasswordUtil.checkPassword(password, user.getPassWord())) {
             return user;
         }
         return null;
@@ -67,8 +69,9 @@ public class UserServiceImpl implements UserService {
         }
         long millis = System.currentTimeMillis();
         Date date = new Date(millis);
-        // roleid = 3 là người dùng thông thường, status = 1 (đã kích hoạt)
-        User newUser = new User(email, username, fullname, password, null, 3, phone, date, 1, null, null);
+        // Băm mật khẩu bằng BCrypt trước khi lưu vào CSDL
+        String hashedPassword = PasswordUtil.hashPassword(password.trim());
+        User newUser = new User(email, username, fullname, hashedPassword, null, 3, phone, date, 1, null, null);
         userDao.insert(newUser);
         return true;
     }
@@ -80,8 +83,9 @@ public class UserServiceImpl implements UserService {
         }
         long millis = System.currentTimeMillis();
         Date date = new Date(millis);
-        // status = 0 (Chưa kích hoạt, chờ nhập mã OTP)
-        User newUser = new User(email, username, fullname, password, null, 3, phone, date, 0, otp, otpExpiry);
+        // Băm mật khẩu bằng BCrypt trước khi lưu vào CSDL
+        String hashedPassword = PasswordUtil.hashPassword(password.trim());
+        User newUser = new User(email, username, fullname, hashedPassword, null, 3, phone, date, 0, otp, otpExpiry);
         userDao.insert(newUser);
         return true;
     }

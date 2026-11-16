@@ -19,7 +19,17 @@ public class LogoutController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        processLogout(req, resp);
+    }
 
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+        processLogout(req, resp);
+    }
+
+    private void processLogout(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
         // 1. Hủy phiên làm việc HttpSession
         HttpSession session = req.getSession(false);
         if (session != null) {
@@ -27,13 +37,19 @@ public class LogoutController extends HttpServlet {
         }
 
         // 2. Xóa Cookie ghi nhớ đăng nhập
+        String contextPath = req.getContextPath().isEmpty() ? "/" : req.getContextPath();
         Cookie cookie = new Cookie(Constant.COOKIE_REMEMBER, "");
         cookie.setMaxAge(0);
-        cookie.setPath(req.getContextPath().isEmpty() ? "/" : req.getContextPath());
+        cookie.setPath(contextPath);
         resp.addCookie(cookie);
 
-        // 3. Chuyển hướng về trang đăng nhập
-        resp.sendRedirect(req.getContextPath() + "/login");
+        // Xóa thêm ở root path "/" để đảm bảo xóa sạch cookie trên mọi trình duyệt
+        Cookie rootCookie = new Cookie(Constant.COOKIE_REMEMBER, "");
+        rootCookie.setMaxAge(0);
+        rootCookie.setPath("/");
+        resp.addCookie(rootCookie);
+
+        // 3. Chuyển hướng về trang đăng nhập kèm cờ thông báo logout thành công
+        resp.sendRedirect(req.getContextPath() + "/login?logout=1");
     }
 }
-
