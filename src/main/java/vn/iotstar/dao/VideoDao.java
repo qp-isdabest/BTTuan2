@@ -18,4 +18,6 @@ public interface VideoDao {
     List<Video> findByUserId(int userId);
 
     List<Video> searchByTitle(String keyword);
+
+    List<Video> findLatestVideos(int limit);
 }

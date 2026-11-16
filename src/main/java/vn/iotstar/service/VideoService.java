@@ -18,4 +18,8 @@ public interface VideoService {
     List<Video> findByUserId(int userId);
 
     List<Video> searchByTitle(String keyword);
+
+    List<Video> findLatestVideos(int limit);
+
+    List<Video> findTop10LatestVideos();
 }

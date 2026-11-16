@@ -126,4 +126,20 @@ public class VideoDaoImpl implements VideoDao {
             em.close();
         }
     }
+
+    @Override
+    public List<Video> findLatestVideos(int limit) {
+        EntityManager em = JpaConfig.getEntityManager();
+        try {
+            String jpql = "SELECT v FROM Video v JOIN FETCH v.user WHERE v.active = true ORDER BY v.videoId DESC";
+            return em.createQuery(jpql, Video.class)
+                    .setMaxResults(limit)
+                    .getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return List.of();
+        } finally {
+            em.close();
+        }
+    }
 }

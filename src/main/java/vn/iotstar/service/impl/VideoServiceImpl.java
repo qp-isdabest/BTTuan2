@@ -56,4 +56,14 @@ public class VideoServiceImpl implements VideoService {
         }
         return videoDao.searchByTitle(keyword.trim());
     }
+
+    @Override
+    public List<Video> findLatestVideos(int limit) {
+        return videoDao.findLatestVideos(limit > 0 ? limit : 10);
+    }
+
+    @Override
+    public List<Video> findTop10LatestVideos() {
+        return videoDao.findLatestVideos(10);
+    }
 }

@@ -34,6 +34,10 @@ public class HomeController extends HttpServlet {
         User user = (User) session.getAttribute(Constant.SESSION_ACCOUNT);
         req.setAttribute("user", user);
 
+        // Lấy danh sách 10 video mới nhất trên hệ thống (Top 10 Latest Videos)
+        List<Video> latestVideos = videoService.findTop10LatestVideos();
+        req.setAttribute("latestVideos", latestVideos);
+
         // Lấy danh sách video của người dùng hiện tại (1 - N)
         List<Video> myVideos = videoService.findByUserId(user.getId());
         req.setAttribute("myVideos", myVideos);

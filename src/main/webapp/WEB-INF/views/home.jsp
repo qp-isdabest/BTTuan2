@@ -130,6 +130,66 @@
         </div>
     </div>
 
+    <!-- 10 Video Mới Nhất Trên Hệ Thống -->
+    <div class="card shadow-sm border-0 mt-4">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0 fw-bold text-dark">
+                <i class="bi bi-fire me-2 text-danger"></i>10 Video Mới Nhất Trên Hệ Thống
+            </h5>
+            <div>
+                <span class="badge bg-danger">${latestVideos.size()} videos mới</span>
+                <a href="${pageContext.request.contextPath}/videos" class="btn btn-sm btn-outline-primary ms-2">
+                    <i class="bi bi-grid me-1"></i>Xem tất cả
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <c:choose>
+                <c:when test="${not empty latestVideos}">
+                    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-3">
+                        <c:forEach items="${latestVideos}" var="lv">
+                            <div class="col">
+                                <div class="card h-100 shadow-sm border">
+                                    <div class="position-relative">
+                                        <img src="${lv.poster}" class="card-img-top" alt="${lv.title}" 
+                                             style="height: 130px; object-fit: cover;"
+                                             onerror="this.src='https://placehold.co/300x180?text=Video'">
+                                        <span class="position-absolute bottom-0 end-0 bg-dark bg-opacity-75 text-white px-2 py-0 small rounded-start m-1" style="font-size: 11px;">
+                                            <i class="bi bi-eye me-1"></i>${lv.views}
+                                        </span>
+                                    </div>
+                                    <div class="card-body p-2 d-flex flex-column justify-content-between">
+                                        <div>
+                                            <h6 class="card-title fw-bold text-dark text-truncate mb-1" title="${lv.title}" style="font-size: 13px;">
+                                                ${lv.title}
+                                            </h6>
+                                            <small class="text-muted text-truncate d-block" style="font-size: 11px;">
+                                                <i class="bi bi-person me-1"></i>${lv.user.fullName}
+                                            </small>
+                                        </div>
+                                        <div class="mt-2 pt-2 border-top">
+                                            <c:if test="${not empty lv.url}">
+                                                <a href="${lv.url}" target="_blank" class="btn btn-primary btn-sm w-100 py-1" style="font-size: 12px;">
+                                                    <i class="bi bi-play-fill me-1"></i>Xem video
+                                                </a>
+                                            </c:if>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </c:forEach>
+                    </div>
+                </c:when>
+                <c:otherwise>
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-camera-video fs-2 d-block mb-2"></i>
+                        Chưa có video nào trong hệ thống.
+                    </div>
+                </c:otherwise>
+            </c:choose>
+        </div>
+    </div>
+
     <!-- Danh sách Video của người dùng (Minh họa mối quan hệ 1 - N) -->
     <div class="card shadow-sm border-0 mt-4">
         <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
