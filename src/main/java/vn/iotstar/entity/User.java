@@ -3,6 +3,8 @@ package vn.iotstar.entity;
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -46,6 +48,10 @@ public class User implements Serializable {
 
     @Column(name = "otp_expiry")
     private Long otpExpiry; // Thời gian hết hạn OTP (epoch milliseconds)
+
+    // Quan hệ 1 - N: Một người dùng có thể sở hữu nhiều video
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Video> videos = new ArrayList<>();
 
     public User() {
     }
@@ -170,6 +176,29 @@ public class User implements Serializable {
 
     public void setOtpExpiry(Long otpExpiry) {
         this.otpExpiry = otpExpiry;
+    }
+
+    public List<Video> getVideos() {
+        return videos;
+    }
+
+    public void setVideos(List<Video> videos) {
+        this.videos = videos;
+    }
+
+    public void addVideo(Video video) {
+        if (videos == null) {
+            videos = new ArrayList<>();
+        }
+        videos.add(video);
+        video.setUser(this);
+    }
+
+    public void removeVideo(Video video) {
+        if (videos != null) {
+            videos.remove(video);
+            video.setUser(null);
+        }
     }
 
     @Override

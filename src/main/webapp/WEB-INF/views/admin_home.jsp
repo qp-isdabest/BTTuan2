@@ -111,6 +111,79 @@
             </table>
         </div>
     </div>
+
+    <!-- Bảng danh sách Videos (Quan hệ 1 - N với Users) -->
+    <div class="card shadow-sm border-0 mt-5">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0 fw-bold text-dark">
+                <i class="bi bi-camera-reels-fill me-2 text-danger"></i>Danh Sách Bảng Videos (Mối quan hệ 1 - N với bảng Users)
+            </h5>
+            <div>
+                <span class="badge bg-danger me-2">Tổng số: ${videoList.size()} videos</span>
+                <a href="${pageContext.request.contextPath}/video/add" class="btn btn-sm btn-outline-danger fw-semibold">
+                    <i class="bi bi-plus-circle me-1"></i>Thêm Video
+                </a>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col" class="text-center" style="width: 50px;">#ID</th>
+                        <th scope="col" style="width: 100px;">Ảnh Poster</th>
+                        <th scope="col">Tiêu đề Video</th>
+                        <th scope="col">Người đăng (Tác giả)</th>
+                        <th scope="col" class="text-center">Lượt xem</th>
+                        <th scope="col" class="text-center">Trạng thái</th>
+                        <th scope="col" class="text-center" style="width: 130px;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <c:forEach items="${videoList}" var="v">
+                        <tr>
+                            <td class="text-center fw-bold text-secondary">${v.videoId}</td>
+                            <td>
+                                <img src="${v.poster}" alt="Poster" class="rounded" style="width: 80px; height: 50px; object-fit: cover;">
+                            </td>
+                            <td>
+                                <div class="fw-semibold text-dark">${v.title}</div>
+                                <small class="text-muted text-truncate d-inline-block" style="max-width: 380px;">${v.description}</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-primary-subtle text-primary border border-primary px-2 py-1">
+                                    <i class="bi bi-person-fill me-1"></i>${v.user.fullName} (${v.user.userName})
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-secondary px-2 py-1"><i class="bi bi-eye me-1"></i>${v.views}</span>
+                            </td>
+                            <td class="text-center">
+                                <c:choose>
+                                    <c:when test="${v.active}">
+                                        <span class="badge bg-success">Hoạt động</span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span class="badge bg-danger">Khóa</span>
+                                    </c:otherwise>
+                                </c:choose>
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="${pageContext.request.contextPath}/video/edit?id=${v.videoId}" class="btn btn-outline-warning" title="Chỉnh sửa">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                    <a href="${pageContext.request.contextPath}/video/delete?id=${v.videoId}" class="btn btn-outline-danger" title="Xóa"
+                                       onclick="return confirm('Bạn có chắc chắn muốn xóa video này không?');">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    </c:forEach>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 <!-- Bootstrap 5 JS Bundle -->

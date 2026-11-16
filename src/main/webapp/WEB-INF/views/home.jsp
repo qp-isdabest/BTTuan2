@@ -119,13 +119,53 @@
                         <strong>Kiến trúc hệ thống:</strong>
                         <ul class="mb-0 mt-1 ps-3 text-secondary">
                             <li><strong>Presentation:</strong> Servlets (Login, Register, Waiting, Home) + JSP</li>
-                            <li><strong>Business Logic:</strong> UserService & UserServiceImpl</li>
-                            <li><strong>Data Access:</strong> UserDao & UserDaoImpl với Jakarta Persistence (JPA)</li>
+                            <li><strong>Business Logic:</strong> UserService, VideoService</li>
+                            <li><strong>Data Access:</strong> UserDao, VideoDao (JPA Hibernate 6)</li>
+                            <li><strong>Quan hệ thực thể:</strong> 1 - N (Users & Videos)</li>
                             <li><strong>Database:</strong> H2 Database Engine</li>
                         </ul>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Danh sách Video của người dùng (Minh họa mối quan hệ 1 - N) -->
+    <div class="card shadow-sm border-0 mt-4">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0 fw-bold text-dark">
+                <i class="bi bi-collection-play-fill me-2 text-danger"></i>Video Thuộc Sở Hữu Của Tôi (Quan hệ 1 - N)
+            </h5>
+            <span class="badge bg-primary">${myVideos.size()} videos</span>
+        </div>
+        <div class="card-body">
+            <c:choose>
+                <c:when test="${not empty myVideos}">
+                    <div class="row g-3">
+                        <c:forEach items="${myVideos}" var="vid">
+                            <div class="col-md-4">
+                                <div class="card h-100 shadow-sm border">
+                                    <img src="${vid.poster}" class="card-img-top" alt="${vid.title}" style="height: 160px; object-fit: cover;">
+                                    <div class="card-body">
+                                        <h6 class="card-title fw-bold text-truncate" title="${vid.title}">${vid.title}</h6>
+                                        <p class="card-text text-muted small text-truncate" style="max-height: 40px;">${vid.description}</p>
+                                    </div>
+                                    <div class="card-footer bg-white border-top-0 d-flex justify-content-between align-items-center small text-muted">
+                                        <span><i class="bi bi-eye me-1"></i>${vid.views} lượt xem</span>
+                                        <a href="${vid.url}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="bi bi-play-circle me-1"></i>Xem</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </c:forEach>
+                    </div>
+                </c:when>
+                <c:otherwise>
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-camera-video-off fs-2 d-block mb-2"></i>
+                        Bạn chưa có video nào được tải lên trong hệ thống.
+                    </div>
+                </c:otherwise>
+            </c:choose>
         </div>
     </div>
 </div>

@@ -15,6 +15,11 @@
                 <li class="nav-item">
                     <a class="nav-link" href="${pageContext.request.contextPath}/home">Trang chủ</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="${pageContext.request.contextPath}/videos">
+                        <i class="bi bi-camera-reels me-1"></i>Quản lý Videos
+                    </a>
+                </li>
                 <c:if test="${sessionScope.account != null && sessionScope.account.roleid == 1}">
                     <li class="nav-item">
                         <a class="nav-link" href="${pageContext.request.contextPath}/admin/home">Quản trị Admin</a>

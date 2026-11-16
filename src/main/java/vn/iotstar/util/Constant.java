@@ -14,5 +14,7 @@ public class Constant {
         public static final String RESET_PASSWORD = "/WEB-INF/views/reset_password.jsp";
         public static final String HOME = "/WEB-INF/views/home.jsp";
         public static final String ADMIN_HOME = "/WEB-INF/views/admin_home.jsp";
+        public static final String VIDEO_LIST = "/WEB-INF/views/video_list.jsp";
+        public static final String VIDEO_FORM = "/WEB-INF/views/video_form.jsp";
     }
 }
