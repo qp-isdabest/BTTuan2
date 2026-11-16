@@ -15,7 +15,7 @@ import vn.iotstar.util.Constant;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet(urlPatterns = {"/video", "/videos", "/video/add", "/video/edit", "/video/delete"})
+@WebServlet(urlPatterns = {"/video", "/videos", "/video/add", "/video/edit", "/video/delete", "/video/detail"})
 public class VideoController extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
@@ -29,6 +29,9 @@ public class VideoController extends HttpServlet {
         String path = req.getServletPath();
 
         switch (path) {
+            case "/video/detail":
+                showVideoDetail(req, resp);
+                break;
             case "/video/add":
                 showAddForm(req, resp);
                 break;
@@ -153,6 +156,39 @@ public class VideoController extends HttpServlet {
         req.setAttribute("targetUserId", targetUserId);
 
         req.getRequestDispatcher(Constant.Path.VIDEO_LIST).forward(req, resp);
+    }
+
+    // 1.1 DETAIL & PLAY: Hiển thị chi tiết và phát video
+    private void showVideoDetail(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+
+        String idStr = req.getParameter("id");
+        if (idStr == null || idStr.trim().isEmpty()) {
+            resp.sendRedirect(req.getContextPath() + "/video");
+            return;
+        }
+
+        try {
+            int videoId = Integer.parseInt(idStr.trim());
+            Video video = videoService.findById(videoId);
+            if (video == null) {
+                resp.sendRedirect(req.getContextPath() + "/video");
+                return;
+            }
+
+            // Tự động tăng lượt xem (view count + 1) khi phát video
+            video.setViews(video.getViews() + 1);
+            videoService.update(video);
+
+            // Lấy danh sách video đề xuất (10 video mới nhất)
+            List<Video> relatedVideos = videoService.findTop10LatestVideos();
+
+            req.setAttribute("video", video);
+            req.setAttribute("relatedVideos", relatedVideos);
+            req.getRequestDispatcher(Constant.Path.VIDEO_DETAIL).forward(req, resp);
+        } catch (NumberFormatException e) {
+            resp.sendRedirect(req.getContextPath() + "/video");
+        }
     }
 
     // 2. CREATE (Form): Hiển thị form tạo mới video

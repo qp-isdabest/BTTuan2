@@ -143,10 +143,16 @@
                         <tr>
                             <td class="text-center fw-bold text-secondary">${v.videoId}</td>
                             <td>
-                                <img src="${v.poster}" alt="Poster" class="rounded" style="width: 80px; height: 50px; object-fit: cover;">
+                                <a href="${pageContext.request.contextPath}/video/detail?id=${v.videoId}">
+                                    <img src="${v.poster}" alt="Poster" class="rounded" style="width: 80px; height: 50px; object-fit: cover;">
+                                </a>
                             </td>
                             <td>
-                                <div class="fw-semibold text-dark">${v.title}</div>
+                                <div class="fw-semibold text-dark">
+                                    <a href="${pageContext.request.contextPath}/video/detail?id=${v.videoId}" class="text-decoration-none text-dark" title="Bấm vào tiêu đề để xem chi tiết và phát video">
+                                        ${v.title}
+                                    </a>
+                                </div>
                                 <small class="text-muted text-truncate d-inline-block" style="max-width: 380px;">${v.description}</small>
                             </td>
                             <td>
@@ -169,6 +175,9 @@
                             </td>
                             <td class="text-center">
                                 <div class="btn-group btn-group-sm" role="group">
+                                    <a href="${pageContext.request.contextPath}/video/detail?id=${v.videoId}" class="btn btn-outline-primary" title="Xem chi tiết & phát">
+                                        <i class="bi bi-play-circle-fill"></i>
+                                    </a>
                                     <a href="${pageContext.request.contextPath}/video/edit?id=${v.videoId}" class="btn btn-outline-warning" title="Chỉnh sửa">
                                         <i class="bi bi-pencil-square"></i>
                                     </a>

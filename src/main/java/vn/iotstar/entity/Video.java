@@ -114,6 +114,35 @@ public class Video implements Serializable {
         this.user = user;
     }
 
+    public String getEmbedUrl() {
+        if (url == null || url.trim().isEmpty()) {
+            return "";
+        }
+        String u = url.trim();
+        if (u.contains("watch?v=")) {
+            String vId = u.substring(u.indexOf("watch?v=") + 8);
+            int ampersandIndex = vId.indexOf('&');
+            if (ampersandIndex != -1) {
+                vId = vId.substring(0, ampersandIndex);
+            }
+            return "https://www.youtube.com/embed/" + vId + "?autoplay=1";
+        } else if (u.contains("youtu.be/")) {
+            String vId = u.substring(u.indexOf("youtu.be/") + 9);
+            int qIndex = vId.indexOf('?');
+            if (qIndex != -1) {
+                vId = vId.substring(0, qIndex);
+            }
+            return "https://www.youtube.com/embed/" + vId + "?autoplay=1";
+        } else if (u.contains("youtube.com/embed/")) {
+            return u.contains("?") ? u + "&autoplay=1" : u + "?autoplay=1";
+        }
+        return u;
+    }
+
+    public boolean isYouTube() {
+        return url != null && (url.contains("youtube.com") || url.contains("youtu.be"));
+    }
+
     @Override
     public String toString() {
         return "Video{" +

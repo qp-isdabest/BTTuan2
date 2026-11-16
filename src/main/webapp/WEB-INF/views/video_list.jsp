@@ -156,8 +156,10 @@
 
                                 <!-- Poster Video -->
                                 <div class="position-relative bg-dark" style="height: 180px;">
-                                    <img src="${v.poster}" alt="${v.title}" class="w-100 h-100 object-fit-cover"
-                                         onerror="this.src='https://placehold.co/400x225?text=Video+Image'">
+                                    <a href="${pageContext.request.contextPath}/video/detail?id=${v.videoId}">
+                                        <img src="${v.poster}" alt="${v.title}" class="w-100 h-100 object-fit-cover"
+                                             onerror="this.src='https://placehold.co/400x225?text=Video+Image'">
+                                    </a>
                                     
                                     <!-- Lượt xem -->
                                     <span class="position-absolute bottom-0 end-0 bg-dark bg-opacity-75 text-white px-2 py-1 small rounded-start m-2">
@@ -181,7 +183,9 @@
                                 <div class="card-body d-flex flex-column justify-content-between p-3">
                                     <div>
                                         <h5 class="card-title fw-bold text-dark mb-2 text-truncate" title="${v.title}" style="font-size: 16px;">
-                                            ${v.title}
+                                            <a href="${pageContext.request.contextPath}/video/detail?id=${v.videoId}" class="text-decoration-none text-dark" title="Bấm vào tiêu đề để xem chi tiết và phát video">
+                                                ${v.title}
+                                            </a>
                                         </h5>
                                         <p class="card-text text-muted small mb-2" style="height: 40px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
                                             ${v.description != null && !v.description.isEmpty() ? v.description : 'Không có mô tả chi tiết.'}
@@ -199,11 +203,9 @@
 
                                         <!-- Các nút thao tác -->
                                         <div class="d-flex gap-2">
-                                            <c:if test="${not empty v.url}">
-                                                <a href="${v.url}" target="_blank" class="btn btn-outline-primary btn-sm flex-grow-1">
-                                                    <i class="bi bi-play-circle me-1"></i>Xem
-                                                </a>
-                                            </c:if>
+                                            <a href="${pageContext.request.contextPath}/video/detail?id=${v.videoId}" class="btn btn-primary btn-sm flex-grow-1">
+                                                <i class="bi bi-play-circle-fill me-1"></i>Xem & Phát
+                                            </a>
                                             <c:if test="${sessionScope.account != null && (sessionScope.account.roleid == 1 || sessionScope.account.id == v.user.id)}">
                                                 <a href="${pageContext.request.contextPath}/video/edit?id=${v.videoId}" class="btn btn-outline-warning btn-sm" title="Chỉnh sửa">
                                                     <i class="bi bi-pencil-square"></i>
@@ -273,12 +275,18 @@
                                             ${(currentPage - 1) * pageSize + loop.index + 1}
                                         </td>
                                         <td>
-                                            <img src="${v.poster}" alt="Poster" class="rounded shadow-sm" 
-                                                 style="width: 80px; height: 50px; object-fit: cover;"
-                                                 onerror="this.src='https://placehold.co/80x50?text=Video'">
+                                            <a href="${pageContext.request.contextPath}/video/detail?id=${v.videoId}">
+                                                <img src="${v.poster}" alt="Poster" class="rounded shadow-sm" 
+                                                     style="width: 80px; height: 50px; object-fit: cover;"
+                                                     onerror="this.src='https://placehold.co/80x50?text=Video'">
+                                            </a>
                                         </td>
                                         <td>
-                                            <div class="fw-semibold text-dark">${v.title}</div>
+                                            <div class="fw-semibold text-dark">
+                                                <a href="${pageContext.request.contextPath}/video/detail?id=${v.videoId}" class="text-decoration-none text-dark" title="Bấm vào tiêu đề để xem chi tiết và phát video">
+                                                    ${v.title}
+                                                </a>
+                                            </div>
                                             <small class="text-muted text-truncate d-inline-block" style="max-width: 350px;">
                                                 ${v.description != null ? v.description : 'Không có mô tả'}
                                             </small>
@@ -303,11 +311,9 @@
                                         </td>
                                         <td class="text-center">
                                             <div class="btn-group btn-group-sm" role="group">
-                                                <c:if test="${not empty v.url}">
-                                                    <a href="${v.url}" target="_blank" class="btn btn-outline-info" title="Xem video">
-                                                        <i class="bi bi-play-circle"></i>
-                                                    </a>
-                                                </c:if>
+                                                <a href="${pageContext.request.contextPath}/video/detail?id=${v.videoId}" class="btn btn-outline-primary" title="Xem chi tiết & phát video">
+                                                    <i class="bi bi-play-circle-fill"></i>
+                                                </a>
                                                 <c:if test="${sessionScope.account != null && (sessionScope.account.roleid == 1 || sessionScope.account.id == v.user.id)}">
                                                     <a href="${pageContext.request.contextPath}/video/edit?id=${v.videoId}" class="btn btn-outline-warning" title="Chỉnh sửa">
                                                         <i class="bi bi-pencil-square"></i>

@@ -16,5 +16,6 @@ public class Constant {
         public static final String ADMIN_HOME = "/WEB-INF/views/admin_home.jsp";
         public static final String VIDEO_LIST = "/WEB-INF/views/video_list.jsp";
         public static final String VIDEO_FORM = "/WEB-INF/views/video_form.jsp";
+        public static final String VIDEO_DETAIL = "/WEB-INF/views/video_detail.jsp";
     }
 }

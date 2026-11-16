@@ -102,6 +102,7 @@ Mật khẩu ban đầu của các tài khoản mẫu đều là `123456`, đã 
 ## 5. Danh sách các URL chính của ứng dụng
 - **Trang chủ (10 video mới nhất):** [http://localhost:8080/Week2/home](http://localhost:8080/Week2/home)
 - **Tất cả videos của user (Phân trang 6sp/trang):** [http://localhost:8080/Week2/video](http://localhost:8080/Week2/video)
+- **Xem chi tiết và phát Video:** [http://localhost:8080/Week2/video/detail?id=...](http://localhost:8080/Week2/video/detail)
 - **Đăng nhập (Session & Cookie):** [http://localhost:8080/Week2/login](http://localhost:8080/Week2/login)
 - **Đăng ký (Kích hoạt OTP Email):** [http://localhost:8080/Week2/register](http://localhost:8080/Week2/register)
 - **Quên mật khẩu (OTP Email):** [http://localhost:8080/Week2/forgot-password](http://localhost:8080/Week2/forgot-password)
@@ -110,7 +111,7 @@ Mật khẩu ban đầu của các tài khoản mẫu đều là `123456`, đã 
 
 ---
 
-## 5. Hướng dẫn chạy dự án
+## 6. Hướng dẫn chạy dự án
 
 ### Cách 1: Chạy bằng file script PowerShell (Khuyên dùng)
 1. Mở PowerShell tại thư mục dự án `24110050_PhanTheQuan_Week2`.

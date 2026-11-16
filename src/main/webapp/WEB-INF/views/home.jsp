@@ -151,9 +151,11 @@
                             <div class="col">
                                 <div class="card h-100 shadow-sm border">
                                     <div class="position-relative">
-                                        <img src="${lv.poster}" class="card-img-top" alt="${lv.title}" 
-                                             style="height: 130px; object-fit: cover;"
-                                             onerror="this.src='https://placehold.co/300x180?text=Video'">
+                                        <a href="${pageContext.request.contextPath}/video/detail?id=${lv.videoId}">
+                                            <img src="${lv.poster}" class="card-img-top" alt="${lv.title}" 
+                                                 style="height: 130px; object-fit: cover;"
+                                                 onerror="this.src='https://placehold.co/300x180?text=Video'">
+                                        </a>
                                         <span class="position-absolute bottom-0 end-0 bg-dark bg-opacity-75 text-white px-2 py-0 small rounded-start m-1" style="font-size: 11px;">
                                             <i class="bi bi-eye me-1"></i>${lv.views}
                                         </span>
@@ -161,18 +163,18 @@
                                     <div class="card-body p-2 d-flex flex-column justify-content-between">
                                         <div>
                                             <h6 class="card-title fw-bold text-dark text-truncate mb-1" title="${lv.title}" style="font-size: 13px;">
-                                                ${lv.title}
+                                                <a href="${pageContext.request.contextPath}/video/detail?id=${lv.videoId}" class="text-decoration-none text-dark" title="Bấm để xem chi tiết và phát video">
+                                                    ${lv.title}
+                                                </a>
                                             </h6>
                                             <small class="text-muted text-truncate d-block" style="font-size: 11px;">
                                                 <i class="bi bi-person me-1"></i>${lv.user.fullName}
                                             </small>
                                         </div>
                                         <div class="mt-2 pt-2 border-top">
-                                            <c:if test="${not empty lv.url}">
-                                                <a href="${lv.url}" target="_blank" class="btn btn-primary btn-sm w-100 py-1" style="font-size: 12px;">
-                                                    <i class="bi bi-play-fill me-1"></i>Xem video
-                                                </a>
-                                            </c:if>
+                                            <a href="${pageContext.request.contextPath}/video/detail?id=${lv.videoId}" class="btn btn-primary btn-sm w-100 py-1" style="font-size: 12px;">
+                                                <i class="bi bi-play-fill me-1"></i>Xem & Phát Video
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -205,14 +207,22 @@
                         <c:forEach items="${myVideos}" var="vid">
                             <div class="col-md-4">
                                 <div class="card h-100 shadow-sm border">
-                                    <img src="${vid.poster}" class="card-img-top" alt="${vid.title}" style="height: 160px; object-fit: cover;">
+                                    <a href="${pageContext.request.contextPath}/video/detail?id=${vid.videoId}">
+                                        <img src="${vid.poster}" class="card-img-top" alt="${vid.title}" style="height: 160px; object-fit: cover;">
+                                    </a>
                                     <div class="card-body">
-                                        <h6 class="card-title fw-bold text-truncate" title="${vid.title}">${vid.title}</h6>
+                                        <h6 class="card-title fw-bold text-truncate" title="${vid.title}">
+                                            <a href="${pageContext.request.contextPath}/video/detail?id=${vid.videoId}" class="text-decoration-none text-dark" title="Bấm để xem chi tiết và phát video">
+                                                ${vid.title}
+                                            </a>
+                                        </h6>
                                         <p class="card-text text-muted small text-truncate" style="max-height: 40px;">${vid.description}</p>
                                     </div>
                                     <div class="card-footer bg-white border-top-0 d-flex justify-content-between align-items-center small text-muted">
                                         <span><i class="bi bi-eye me-1"></i>${vid.views} lượt xem</span>
-                                        <a href="${vid.url}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="bi bi-play-circle me-1"></i>Xem</a>
+                                        <a href="${pageContext.request.contextPath}/video/detail?id=${vid.videoId}" class="btn btn-sm btn-primary">
+                                            <i class="bi bi-play-circle-fill me-1"></i>Phát video
+                                        </a>
                                     </div>
                                 </div>
                             </div>
