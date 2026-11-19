@@ -17,5 +17,7 @@ public class Constant {
         public static final String VIDEO_LIST = "/WEB-INF/views/video_list.jsp";
         public static final String VIDEO_FORM = "/WEB-INF/views/video_form.jsp";
         public static final String VIDEO_DETAIL = "/WEB-INF/views/video_detail.jsp";
+        public static final String PROFILE = "/WEB-INF/views/profile.jsp";
+        public static final String VERIFY_EMAIL_OTP = "/WEB-INF/views/verify_email_otp.jsp";
     }
 }

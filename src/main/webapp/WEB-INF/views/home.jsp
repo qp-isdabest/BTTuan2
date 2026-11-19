@@ -42,10 +42,13 @@
         <!-- Thông tin tài khoản người dùng -->
         <div class="col-md-6">
             <div class="card shadow-sm h-100 border-0">
-                <div class="card-header bg-white border-bottom py-3">
+                <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0 text-primary fw-bold">
                         <i class="bi bi-person-lines-fill me-2"></i>Thông Tin Tài Khoản
                     </h5>
+                    <a href="${pageContext.request.contextPath}/profile" class="btn btn-sm btn-outline-primary fw-semibold">
+                        <i class="bi bi-person-gear me-1"></i>Chỉnh sửa Profile
+                    </a>
                 </div>
                 <div class="card-body">
                     <table class="table table-hover mb-0">

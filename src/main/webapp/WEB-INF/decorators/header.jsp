@@ -50,7 +50,14 @@
                         <c:otherwise>
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle text-white fw-semibold d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-person-circle fs-5 me-2"></i>
+                                    <c:choose>
+                                        <c:when test="${not empty sessionScope.account.avatar}">
+                                            <img src="${sessionScope.account.avatar}" alt="Avatar" class="rounded-circle me-2 border border-2 border-white shadow-sm" style="width: 32px; height: 32px; object-fit: cover;">
+                                        </c:when>
+                                        <c:otherwise>
+                                            <i class="bi bi-person-circle fs-5 me-2"></i>
+                                        </c:otherwise>
+                                    </c:choose>
                                     <span>${sessionScope.account.fullName}</span>
                                     <span class="badge bg-light text-primary ms-2">
                                         <c:choose>
@@ -62,7 +69,7 @@
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end shadow">
                                     <li class="dropdown-header text-muted small">Tài khoản: @${sessionScope.account.userName}</li>
-                                    <li><a class="dropdown-item" href="${pageContext.request.contextPath}/home"><i class="bi bi-person me-2"></i>Thông tin tài khoản</a></li>
+                                    <li><a class="dropdown-item" href="${pageContext.request.contextPath}/profile"><i class="bi bi-person-gear me-2"></i>Hồ sơ tài khoản (Profile)</a></li>
                                     <li><a class="dropdown-item" href="${pageContext.request.contextPath}/video"><i class="bi bi-collection-play me-2"></i>Quản lý Videos</a></li>
                                     <c:if test="${sessionScope.account.roleid == 1}">
                                         <li><hr class="dropdown-divider"></li>

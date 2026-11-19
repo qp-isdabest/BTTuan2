@@ -46,6 +46,16 @@ public class EmailUtil {
                 "Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn. Vui lòng nhập mã OTP dưới đây để hoàn tất việc tạo mật khẩu mới:");
     }
 
+    /**
+     * Gửi email chứa mã OTP xác nhận thay đổi địa chỉ email mới
+     */
+    public static boolean sendUpdateEmailOtp(String recipientEmail, String recipientName, String otpCode) {
+        return sendCustomOtpEmail(recipientEmail, recipientName, otpCode, 
+                "Mã OTP Xác Nhận Cập Nhật Email Mới", 
+                "XÁC NHẬN CẬP NHẬT EMAIL", 
+                "Bạn đang thực hiện thay đổi địa chỉ email cho tài khoản của mình. Để hoàn tất việc cập nhật sang email mới này, vui lòng nhập mã OTP xác thực 6 chữ số dưới đây:");
+    }
+
     private static boolean sendCustomOtpEmail(String recipientEmail, String recipientName, String otpCode, String subject, String headerTitle, String description) {
         System.out.println("\n=======================================================");
         System.out.println(">>> [OTP EMAIL SERVICE - " + headerTitle + "]");

@@ -33,6 +33,7 @@ Dự án tuân thủ nghiêm ngặt mô hình chuẩn theo bài giảng slide:
 │   │   ├── UserService.java & UserServiceImpl  # Service nghiệp vụ người dùng, xác thực, OTP
 │   │   └── VideoService.java & VideoServiceImpl# Service nghiệp vụ Video (CRUD logic)
 │   ├── controller/                             # TẦNG 1: PRESENTATION LAYER (Controllers)
+│   │   ├── ProfileController.java              # Quản lý Profile, Upload ảnh Cloudinary multipart, Xác thực đổi Email qua OTP (/profile, /verify-email-otp, /resend-email-otp)
 │   │   ├── VideoController.java                # Xử lý CRUD Video & Phân trang 6sp/trang (/video, /videos, /video/add, /video/edit, /video/delete)
 │   │   ├── LoginController.java                # Xử lý đăng nhập với BCrypt, kiểm tra OTP, lưu Session & Cookie
 │   │   ├── RegisterController.java             # Xử lý đăng ký, băm mật khẩu, tạo mã OTP và gửi qua Email
@@ -45,6 +46,8 @@ Dự án tuân thủ nghiêm ngặt mô hình chuẩn theo bài giảng slide:
 │   │   └── LogoutController.java               # Hủy Session, xóa Cookie Remember-Me ở mọi Path
 │   └── util/
 │       ├── Constant.java                       # Hằng số định danh Session, Cookie, đường dẫn View
+│       ├── CloudinaryUtil.java                 # Tiện ích cấu hình và Upload Multipart Image lên Cloudinary CDN
+│       ├── ValidationUtil.java                 # Tiện ích kiểm tra tính hợp lệ dữ liệu (Email, Phone, Username, Password, URL, OTP)
 │       ├── PasswordUtil.java                   # Tiện ích băm và xác thực mật khẩu BCrypt (kèm SHA-256)
 │       └── EmailUtil.java                      # Tiện ích gửi Email HTML chứa mã OTP qua Jakarta Mail
 └── src/main/webapp/
@@ -56,6 +59,8 @@ Dự án tuân thủ nghiêm ngặt mô hình chuẩn theo bài giảng slide:
     │   │   ├── header.jsp                      # Thanh điều hướng Navbar Bootstrap 5 responsive
     │   │   └── footer.jsp                      # Chân trang Bootstrap 5 chuyên nghiệp & thông tin sinh viên
     │   └── views/                              # TẦNG 1: PRESENTATION LAYER (Nội dung từng trang JSP)
+    │       ├── profile.jsp                     # Giao diện Xem & Cập nhật Hồ sơ cá nhân (Form Multipart Cloudinary)
+    │       ├── verify_email_otp.jsp            # Giao diện Nhập mã OTP xác thực khi đổi sang Email mới
     │       ├── topbar.jsp                      # Header / Thanh điều hướng dùng chung
     │       ├── video_list.jsp                  # Giao diện Danh sách Video + Tìm kiếm (READ)
     │       ├── video_form.jsp                  # Giao diện Form thêm mới & chỉnh sửa Video (CREATE / UPDATE)
@@ -152,7 +157,30 @@ Dự án triển khai cơ chế kiểm tra tính hợp lệ dữ liệu toàn di
 
 ---
 
-## 5. Các tính năng cốt lõi khác
+## 5. Chức năng Quản lý Hồ sơ (Profile), Upload Ảnh Cloudinary & Xác thực Đổi Email qua OTP
+
+Hệ thống cung cấp trang quản lý hồ sơ người dùng toàn diện tại URL `/profile` với giao diện Bootstrap được SiteMesh 3 tự động trang trí:
+
+### 5.1. Cập nhật thông tin Fullname, Phone và Avatar
+* **Xem thông tin chi tiết:** Hiển thị ảnh đại diện, họ và tên, username (chỉ đọc), email, số điện thoại, vai trò quyền hạn và ngày khởi tạo tài khoản.
+* **Upload ảnh đại diện (Avatar) lên Cloudinary bằng Multipart:**
+  - Servlet `ProfileController` được cấu hình `@MultipartConfig`.
+  - Nhận file qua `request.getPart("image")`, kiểm tra định dạng hình ảnh hợp lệ (JPG, PNG, WEBP, GIF).
+  - Tích hợp **Cloudinary Java SDK** (`com.cloudinary:cloudinary-http44:1.39.0`) tải ảnh trực tiếp lên Cloudinary CDN và lưu đường dẫn `secure_url` vào cơ sở dữ liệu.
+  - Hỗ trợ JavaScript xem trước (Preview) ảnh đại diện ngay khi người dùng vừa chọn file.
+
+### 5.2. Quy trình Bảo mật khi Đổi sang Địa chỉ Email Mới
+* **Không đổi Email:** Nếu người dùng giữ nguyên email cũ và chỉ cập nhật họ tên, số điện thoại hoặc avatar, hệ thống cập nhật tức thì vào CSDL và Session.
+* **Đổi sang Email mới:**
+  1. Kiểm tra email mới không được trùng với bất kỳ tài khoản nào khác trong CSDL.
+  2. Tự động sinh mã **OTP 6 chữ số** ngẫu nhiên với thời hạn hiệu lực **5 phút**.
+  3. Gửi email chứa mã OTP xác thực đến chính **địa chỉ Email mới** qua tiện ích `EmailUtil.sendUpdateEmailOtp(...)`.
+  4. Lưu trạng thái chờ cập nhật và chuyển hướng người dùng sang trang `/verify-email-otp`.
+  5. Sau khi người dùng nhập chính xác mã OTP, hệ thống mới chính thức cập nhật địa chỉ email mới vào CSDL, cập nhật lại phiên làm việc `HttpSession` và thông báo hoàn tất thành công.
+
+---
+
+## 6. Các tính năng cốt lõi khác
 
 1. **Mối quan hệ 1 - N (Users & Videos):** Bảng `videos` chứa khóa ngoại `user_id` tham chiếu tới khóa chính của bảng `users`.
 2. **Quên mật khẩu gửi OTP qua Email:** Tự động sinh OTP 6 số (5 phút), gửi mail HTML, cập nhật mật khẩu băm BCrypt.
@@ -163,7 +191,7 @@ Dự án triển khai cơ chế kiểm tra tính hợp lệ dữ liệu toàn di
 
 ---
 
-## 6. Tài khoản thử nghiệm mặc định
+## 7. Tài khoản thử nghiệm mặc định
 
 Mật khẩu ban đầu của các tài khoản mẫu đều là `123456`, đã được tự động băm BCrypt:
 | Tên đăng nhập | Email | Mật khẩu thô | Quyền (Role) | Dữ liệu Video khởi tạo |
@@ -174,8 +202,10 @@ Mật khẩu ban đầu của các tài khoản mẫu đều là `123456`, đã 
 
 ---
 
-## 7. Danh sách các URL chính của ứng dụng
+## 8. Danh sách các URL chính của ứng dụng
 - **Trang chủ (10 video mới nhất):** [http://localhost:8080/Week2/home](http://localhost:8080/Week2/home)
+- **Hồ sơ cá nhân & Cập nhật Profile (Cloudinary):** [http://localhost:8080/Week2/profile](http://localhost:8080/Week2/profile)
+- **Xác thực đổi Email mới (OTP Email):** [http://localhost:8080/Week2/verify-email-otp](http://localhost:8080/Week2/verify-email-otp)
 - **Tất cả videos của user (Phân trang 6sp/trang):** [http://localhost:8080/Week2/video](http://localhost:8080/Week2/video)
 - **Xem chi tiết và phát Video:** [http://localhost:8080/Week2/video/detail?id=...](http://localhost:8080/Week2/video/detail)
 - **Đăng nhập (Session & Cookie):** [http://localhost:8080/Week2/login](http://localhost:8080/Week2/login)
@@ -186,7 +216,7 @@ Mật khẩu ban đầu của các tài khoản mẫu đều là `123456`, đã 
 
 ---
 
-## 8. Hướng dẫn chạy dự án
+## 9. Hướng dẫn chạy dự án
 
 ### Cách 1: Chạy bằng file script PowerShell (Khuyên dùng)
 1. Mở PowerShell tại thư mục dự án `24110050_PhanTheQuan_Week2`.
