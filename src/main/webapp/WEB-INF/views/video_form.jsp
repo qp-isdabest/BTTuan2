@@ -55,47 +55,62 @@
                 </div>
             </c:if>
 
-            <form action="${pageContext.request.contextPath}${isEdit ? '/video/edit' : '/video/add'}" method="post">
+            <form action="${pageContext.request.contextPath}${isEdit ? '/video/edit' : '/video/add'}" method="post" class="needs-validation" novalidate id="videoForm">
                 <c:if test="${isEdit}">
                     <input type="hidden" name="videoId" value="${video.videoId}">
                 </c:if>
 
                 <div class="mb-3">
                     <label class="form-label fw-semibold text-secondary small">TIÊU ĐỀ VIDEO *</label>
-                    <div class="input-group">
+                    <div class="input-group has-validation">
                         <span class="input-group-text bg-light"><i class="bi bi-fonts"></i></span>
-                        <input type="text" class="form-control" name="title" 
-                               value="${isEdit ? video.title : ''}" placeholder="Nhập tiêu đề video..." required autofocus>
+                        <input type="text" class="form-control" name="title" id="videoTitle"
+                               value="${video != null ? video.title : ''}" placeholder="Nhập tiêu đề video (3 - 255 ký tự)..." 
+                               required minlength="3" maxlength="255" autofocus>
+                        <div class="invalid-feedback">
+                            Vui lòng nhập tiêu đề video (độ dài từ 3 đến 255 ký tự).
+                        </div>
                     </div>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label fw-semibold text-secondary small">MÔ TẢ VIDEO</label>
-                    <textarea class="form-control" name="description" rows="3" 
-                              placeholder="Nhập mô tả nội dung video...">${isEdit ? video.description : ''}</textarea>
+                    <textarea class="form-control" name="description" rows="3" maxlength="2000"
+                              placeholder="Nhập mô tả nội dung video (tối đa 2000 ký tự)...">${video != null ? video.description : ''}</textarea>
+                    <div class="form-text small text-muted">Tùy chọn: Tối đa 2000 ký tự.</div>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label fw-semibold text-secondary small">ĐƯỜNG DẪN ẢNH THUMBNAIL (POSTER URL)</label>
-                    <div class="input-group">
+                    <div class="input-group has-validation">
                         <span class="input-group-text bg-light"><i class="bi bi-image"></i></span>
-                        <input type="url" class="form-control" name="poster" 
-                               value="${isEdit ? video.poster : ''}" placeholder="https://example.com/image.jpg">
+                        <input type="url" class="form-control" name="poster" id="posterUrl"
+                               value="${video != null ? video.poster : ''}" placeholder="https://example.com/image.jpg"
+                               pattern="https?://.+">
+                        <div class="invalid-feedback">
+                            Đường dẫn ảnh phải là URL hợp lệ bắt đầu bằng http:// hoặc https://
+                        </div>
                     </div>
+                    <div class="form-text small text-muted">Tùy chọn: Nếu để trống hệ thống sẽ dùng ảnh mặc định.</div>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label fw-semibold text-secondary small">ĐƯỜNG DẪN VIDEO (URL LINK)</label>
-                    <div class="input-group">
+                    <div class="input-group has-validation">
                         <span class="input-group-text bg-light"><i class="bi bi-link-45deg"></i></span>
-                        <input type="url" class="form-control" name="url" 
-                               value="${isEdit ? video.url : ''}" placeholder="https://www.youtube.com/watch?v=...">
+                        <input type="url" class="form-control" name="url" id="videoUrl"
+                               value="${video != null ? video.url : ''}" placeholder="https://www.youtube.com/watch?v=..."
+                               pattern="https?://.+">
+                        <div class="invalid-feedback">
+                            Đường dẫn video phải là URL hợp lệ bắt đầu bằng http:// hoặc https://
+                        </div>
                     </div>
+                    <div class="form-text small text-muted">Tùy chọn: Link video YouTube, Vimeo hoặc direct video link.</div>
                 </div>
 
                 <div class="mb-4 form-check form-switch">
                     <input class="form-check-input" type="checkbox" name="active" id="activeSwitch" 
-                           ${!isEdit || video.active ? 'checked' : ''}>
+                           ${video == null || video.active ? 'checked' : ''}>
                     <label class="form-check-label fw-semibold text-secondary small" for="activeSwitch">
                         Kích hoạt hiển thị công khai (Active)
                     </label>
@@ -105,11 +120,25 @@
                     <a href="${pageContext.request.contextPath}/videos" class="btn btn-outline-secondary">
                         <i class="bi bi-arrow-left me-1"></i>Hủy & Quay lại
                     </a>
-                    <button type="submit" class="btn btn-primary px-4 fw-semibold">
-                        <i class="bi bi-check2-circle me-1"></i>${isEdit ? 'Lưu Thay Đổi' : 'Thêm Video'}
+                    <button type="submit" class="btn btn-primary px-4 fw-semibold shadow-sm">
+                        <i class="bi bi-check2-circle me-1"></i>${isEdit ? 'Lưu Thay Đổi (UPDATE)' : 'Thêm Video Mới (INSERT)'}
                     </button>
                 </div>
             </form>
+
+            <script>
+                (() => {
+                    'use strict';
+                    const form = document.getElementById('videoForm');
+                    form.addEventListener('submit', event => {
+                        if (!form.checkValidity()) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                })();
+            </script>
         </div>
     </div>
 </div>

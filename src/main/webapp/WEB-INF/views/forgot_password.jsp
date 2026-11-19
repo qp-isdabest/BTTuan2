@@ -56,20 +56,39 @@
                 Vui lòng nhập địa chỉ Email hoặc Tên đăng nhập của tài khoản. Chúng tôi sẽ gửi một mã OTP 6 chữ số qua email để bạn thiết lập lại mật khẩu mới.
             </p>
 
-            <form action="${pageContext.request.contextPath}/forgot-password" method="post">
+            <form action="${pageContext.request.contextPath}/forgot-password" method="post" class="needs-validation" novalidate>
                 <div class="mb-4">
-                    <label class="form-label fw-semibold text-secondary small">EMAIL HOẶC TÊN ĐĂNG NHẬP:</label>
-                    <div class="input-group">
+                    <label class="form-label fw-semibold text-secondary small">EMAIL HOẶC TÊN ĐĂNG NHẬP *</label>
+                    <div class="input-group has-validation">
                         <span class="input-group-text bg-light"><i class="bi bi-person-badge"></i></span>
                         <input type="text" class="form-control" name="identifier" 
-                               placeholder="Nhập email hoặc username" value="${identifier != null ? identifier : ''}" required autofocus>
+                               placeholder="Nhập email hoặc username" value="${identifier != null ? identifier : ''}" required minlength="3" autofocus>
+                        <div class="invalid-feedback">
+                            Vui lòng nhập Email hoặc Tên đăng nhập (tối thiểu 3 ký tự).
+                        </div>
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold shadow-sm">
                     <i class="bi bi-send me-1"></i>Gửi mã xác nhận OTP
                 </button>
             </form>
+
+            <script>
+                (() => {
+                    'use strict';
+                    const forms = document.querySelectorAll('.needs-validation');
+                    Array.from(forms).forEach(form => {
+                        form.addEventListener('submit', event => {
+                            if (!form.checkValidity()) {
+                                event.preventDefault();
+                                event.stopPropagation();
+                            }
+                            form.classList.add('was-validated');
+                        }, false);
+                    });
+                })();
+            </script>
 
             <div class="text-center mt-4 pt-3 border-top">
                 <a href="${pageContext.request.contextPath}/login" class="text-decoration-none small text-muted">

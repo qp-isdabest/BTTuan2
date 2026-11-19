@@ -78,16 +78,28 @@
                 </div>
             </c:if>
 
-            <form action="${pageContext.request.contextPath}/login" method="post">
-                <div class="input-group mb-3">
-                    <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
-                    <input type="text" class="form-control" name="username" placeholder="Tên đăng nhập" 
-                           value="${username != null ? username : ''}" required autofocus>
+            <form action="${pageContext.request.contextPath}/login" method="post" class="needs-validation" novalidate>
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold text-secondary">Tên đăng nhập *</label>
+                    <div class="input-group has-validation">
+                        <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
+                        <input type="text" class="form-control" name="username" placeholder="Nhập tên đăng nhập" 
+                               value="${username != null ? username : ''}" required minlength="3" autofocus>
+                        <div class="invalid-feedback">
+                            Vui lòng nhập tên đăng nhập (tối thiểu 3 ký tự).
+                        </div>
+                    </div>
                 </div>
 
-                <div class="input-group mb-3">
-                    <span class="input-group-text bg-light"><i class="bi bi-key"></i></span>
-                    <input type="password" class="form-control" name="password" placeholder="Mật khẩu" required>
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold text-secondary">Mật khẩu *</label>
+                    <div class="input-group has-validation">
+                        <span class="input-group-text bg-light"><i class="bi bi-key"></i></span>
+                        <input type="password" class="form-control" name="password" placeholder="Nhập mật khẩu" required minlength="1">
+                        <div class="invalid-feedback">
+                            Vui lòng nhập mật khẩu của bạn.
+                        </div>
+                    </div>
                 </div>
 
                 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -100,10 +112,27 @@
                     <a href="${pageContext.request.contextPath}/forgot-password" class="text-decoration-none small text-primary fw-semibold">Quên mật khẩu?</a>
                 </div>
 
-                <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold shadow-sm">
                     <i class="bi bi-box-arrow-in-right me-1"></i>Đăng nhập
                 </button>
             </form>
+
+            <script>
+                // Bootstrap client-side form validation
+                (() => {
+                    'use strict';
+                    const forms = document.querySelectorAll('.needs-validation');
+                    Array.from(forms).forEach(form => {
+                        form.addEventListener('submit', event => {
+                            if (!form.checkValidity()) {
+                                event.preventDefault();
+                                event.stopPropagation();
+                            }
+                            form.classList.add('was-validated');
+                        }, false);
+                    });
+                })();
+            </script>
 
             <div class="text-center mt-4">
                 <p class="mb-0 text-muted">

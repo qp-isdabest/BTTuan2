@@ -128,7 +128,31 @@ Khai báo `ConfigurableSiteMeshFilter` đón bắt tất cả request và forwar
 
 ---
 
-## 4. Các tính năng cốt lõi khác
+## 4. Cơ chế Validation 2 lớp (Client-side & Server-side) cho các FORM
+
+Dự án triển khai cơ chế kiểm tra tính hợp lệ dữ liệu toàn diện (Validation) 2 lớp an toàn:
+
+### 4.1. Phía Trình duyệt (Client-side Validation)
+* **Bootstrap 5 UI Validation (`needs-validation`, `novalidate`):** Tự động hiển thị các thông báo trực quan đỏ/xanh (`is-invalid`, `invalid-feedback`) ngay khi bấm submit hoặc nhập sai.
+* **HTML5 Attributes:** Ràng buộc chặt chẽ với `required`, `minlength`, `maxlength`, `pattern`, `type="email"`, `type="url"`, `type="tel"`.
+* **Custom JavaScript Rules:**
+  - Kiểm tra mật khẩu xác nhận trùng khớp theo thời gian thực (`input` event trên `password` và `confirmPassword`).
+  - Kiểm tra định dạng số điện thoại Việt Nam (10 số, bắt đầu bằng `03`, `05`, `07`, `08`, `09`).
+  - Kiểm tra định dạng URL (bắt đầu bằng `http://` hoặc `https://`) cho Video và Poster.
+
+### 4.2. Phía Máy chủ (Server-side Validation)
+* **Tiện ích tập trung [ValidationUtil.java](file:///d:/Study/2026-2027/HK1/DOT2/WEB/BTTuan2/24110050_PhanTheQuan_Week2/src/main/java/vn/iotstar/util/ValidationUtil.java):** Xây dựng các hàm kiểm tra chuẩn hóa với Regular Expression cho Email, Phone, Username, Password, URL, OTP.
+* **Các Form được bảo vệ toàn diện:**
+  1. **Đăng nhập (Login - `LoginController` & `login.jsp`):** Kiểm tra bắt buộc không để trống, kiểm tra độ dài tối thiểu username, báo lỗi tài khoản không tồn tại, sai mật khẩu hoặc tài khoản chưa kích hoạt OTP. Giữ lại giá trị username.
+  2. **Đăng ký (Register - `RegisterController` & `register.jsp`):** Kiểm tra các trường bắt buộc, định dạng username (3-30 ký tự, không dấu cách), định dạng họ và tên, định dạng Email RFC 5322, số điện thoại 10 số, độ dài mật khẩu (>= 6), mật khẩu xác nhận trùng khớp, kiểm tra trùng lặp trong CSDL. Giữ lại toàn bộ thông tin form khi phát hiện lỗi.
+  3. **Quên mật khẩu (Forgot Password - `ForgotPasswordController` & `forgot_password.jsp`):** Kiểm tra bắt buộc, định dạng email hoặc username, kiểm tra sự tồn tại của tài khoản trước khi gửi OTP. Giữ lại giá trị input.
+  4. **Đặt lại mật khẩu & Kích hoạt OTP (`ResetPasswordController`, `VerifyOtpController`):** Kiểm tra mã OTP đúng 6 chữ số (`^\d{6}$`), kiểm tra hạn 5 phút, kiểm tra mật khẩu mới >= 6 ký tự và trùng khớp mật khẩu xác nhận.
+  5. **Thêm Video (Insert - `VideoController.processAdd` & `video_form.jsp`):** Kiểm tra tiêu đề bắt buộc (3 - 255 ký tự), mô tả (tối đa 2000 ký tự), kiểm tra định dạng Poster URL và Video URL (`https?://.+`). Giữ lại nguyên vẹn các trường đã nhập khi có lỗi.
+  6. **Chỉnh sửa Video (Edit - `VideoController.processEdit` & `video_form.jsp`):** Kiểm tra `videoId` hợp lệ, tiêu đề (3 - 255 ký tự), format URL của Poster và Video, bảo toàn thông tin chỉnh sửa khi phát hiện lỗi dữ liệu.
+
+---
+
+## 5. Các tính năng cốt lõi khác
 
 1. **Mối quan hệ 1 - N (Users & Videos):** Bảng `videos` chứa khóa ngoại `user_id` tham chiếu tới khóa chính của bảng `users`.
 2. **Quên mật khẩu gửi OTP qua Email:** Tự động sinh OTP 6 số (5 phút), gửi mail HTML, cập nhật mật khẩu băm BCrypt.
@@ -139,7 +163,7 @@ Khai báo `ConfigurableSiteMeshFilter` đón bắt tất cả request và forwar
 
 ---
 
-## 4. Tài khoản thử nghiệm mặc định
+## 6. Tài khoản thử nghiệm mặc định
 
 Mật khẩu ban đầu của các tài khoản mẫu đều là `123456`, đã được tự động băm BCrypt:
 | Tên đăng nhập | Email | Mật khẩu thô | Quyền (Role) | Dữ liệu Video khởi tạo |
@@ -150,7 +174,7 @@ Mật khẩu ban đầu của các tài khoản mẫu đều là `123456`, đã 
 
 ---
 
-## 5. Danh sách các URL chính của ứng dụng
+## 7. Danh sách các URL chính của ứng dụng
 - **Trang chủ (10 video mới nhất):** [http://localhost:8080/Week2/home](http://localhost:8080/Week2/home)
 - **Tất cả videos của user (Phân trang 6sp/trang):** [http://localhost:8080/Week2/video](http://localhost:8080/Week2/video)
 - **Xem chi tiết và phát Video:** [http://localhost:8080/Week2/video/detail?id=...](http://localhost:8080/Week2/video/detail)
@@ -162,7 +186,7 @@ Mật khẩu ban đầu của các tài khoản mẫu đều là `123456`, đã 
 
 ---
 
-## 6. Hướng dẫn chạy dự án
+## 8. Hướng dẫn chạy dự án
 
 ### Cách 1: Chạy bằng file script PowerShell (Khuyên dùng)
 1. Mở PowerShell tại thư mục dự án `24110050_PhanTheQuan_Week2`.

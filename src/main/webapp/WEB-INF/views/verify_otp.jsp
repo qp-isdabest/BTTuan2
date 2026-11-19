@@ -73,19 +73,38 @@
                 <small class="text-muted">Mã OTP có hiệu lực trong vòng <strong>5 phút</strong>.</small>
             </div>
 
-            <form action="${pageContext.request.contextPath}/verify-otp" method="post">
+            <form action="${pageContext.request.contextPath}/verify-otp" method="post" class="needs-validation" novalidate id="otpForm">
                 <input type="hidden" name="email" value="${email}">
 
                 <div class="mb-4">
-                    <label class="form-label fw-semibold text-secondary small">MÃ XÁC THỰC OTP (6 CHỮ SỐ):</label>
-                    <input type="text" class="form-control form-control-lg otp-input" name="otp" 
-                           placeholder="------" maxlength="6" pattern="[0-9]{6}" required autofocus>
+                    <label class="form-label fw-semibold text-secondary small">MÃ XÁC THỰC OTP (ĐÚNG 6 CHỮ SỐ) *</label>
+                    <div class="has-validation">
+                        <input type="text" class="form-control form-control-lg otp-input" name="otp" 
+                               placeholder="------" maxlength="6" pattern="[0-9]{6}" required autofocus>
+                        <div class="invalid-feedback text-center">
+                            Vui lòng nhập đúng 6 chữ số mã OTP.
+                        </div>
+                    </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold mb-3">
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold mb-3 shadow-sm">
                     <i class="bi bi-check-circle me-1"></i>Xác nhận & Kích hoạt
                 </button>
             </form>
+
+            <script>
+                (() => {
+                    'use strict';
+                    const form = document.getElementById('otpForm');
+                    form.addEventListener('submit', event => {
+                        if (!form.checkValidity()) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                })();
+            </script>
 
             <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
                 <a href="${pageContext.request.contextPath}/resend-otp?email=${email}" class="text-decoration-none small text-primary fw-semibold">

@@ -11,6 +11,7 @@ import vn.iotstar.entity.User;
 import vn.iotstar.service.UserService;
 import vn.iotstar.service.impl.UserServiceImpl;
 import vn.iotstar.util.Constant;
+import vn.iotstar.util.ValidationUtil;
 
 import java.io.IOException;
 
@@ -69,8 +70,18 @@ public class LoginController extends HttpServlet {
 
         String alertMsg;
 
-        if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()) {
-            alertMsg = "Tài khoản hoặc mật khẩu không được để trống!";
+        // 1. Validation kiểm tra rỗng
+        if (ValidationUtil.isEmpty(username) || ValidationUtil.isEmpty(password)) {
+            alertMsg = "Tài khoản và mật khẩu không được để trống!";
+            req.setAttribute("alert", alertMsg);
+            req.setAttribute("username", username);
+            req.getRequestDispatcher(Constant.Path.LOGIN).forward(req, resp);
+            return;
+        }
+
+        // 2. Validation độ dài tài khoản
+        if (username.trim().length() < 3) {
+            alertMsg = "Tên đăng nhập phải có ít nhất 3 ký tự!";
             req.setAttribute("alert", alertMsg);
             req.setAttribute("username", username);
             req.getRequestDispatcher(Constant.Path.LOGIN).forward(req, resp);

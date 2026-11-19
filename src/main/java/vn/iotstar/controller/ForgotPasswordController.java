@@ -10,6 +10,7 @@ import vn.iotstar.entity.User;
 import vn.iotstar.service.UserService;
 import vn.iotstar.service.impl.UserServiceImpl;
 import vn.iotstar.util.Constant;
+import vn.iotstar.util.ValidationUtil;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -70,15 +71,32 @@ public class ForgotPasswordController extends HttpServlet {
         String identifier = req.getParameter("identifier");
         req.setAttribute("identifier", identifier);
 
-        if (identifier == null || identifier.trim().isEmpty()) {
+        // 1. Kiểm tra rỗng
+        if (ValidationUtil.isEmpty(identifier)) {
             req.setAttribute("alert", "Vui lòng nhập Email hoặc Tên đăng nhập của bạn!");
             req.getRequestDispatcher(Constant.Path.FORGOT_PASSWORD).forward(req, resp);
             return;
         }
 
-        User user = userService.findByUsernameOrEmail(identifier.trim());
+        String trimmedId = identifier.trim();
+
+        // 2. Nếu người dùng nhập dạng email thì kiểm tra format email
+        if (trimmedId.contains("@") && !ValidationUtil.isValidEmail(trimmedId)) {
+            req.setAttribute("alert", "Định dạng email không hợp lệ (Ví dụ: user@example.com)!");
+            req.getRequestDispatcher(Constant.Path.FORGOT_PASSWORD).forward(req, resp);
+            return;
+        }
+
+        // 3. Nếu là tên đăng nhập thì kiểm tra độ dài tối thiểu
+        if (!trimmedId.contains("@") && trimmedId.length() < 3) {
+            req.setAttribute("alert", "Tên đăng nhập phải có độ dài ít nhất 3 ký tự!");
+            req.getRequestDispatcher(Constant.Path.FORGOT_PASSWORD).forward(req, resp);
+            return;
+        }
+
+        User user = userService.findByUsernameOrEmail(trimmedId);
         if (user == null) {
-            req.setAttribute("alert", "Không tìm thấy tài khoản với thông tin đã cung cấp!");
+            req.setAttribute("alert", "Không tìm thấy tài khoản nào khớp với thông tin đã cung cấp!");
             req.getRequestDispatcher(Constant.Path.FORGOT_PASSWORD).forward(req, resp);
             return;
         }

@@ -11,6 +11,7 @@ import vn.iotstar.entity.Video;
 import vn.iotstar.service.VideoService;
 import vn.iotstar.service.impl.VideoServiceImpl;
 import vn.iotstar.util.Constant;
+import vn.iotstar.util.ValidationUtil;
 
 import java.io.IOException;
 import java.util.List;
@@ -224,8 +225,45 @@ public class VideoController extends HttpServlet {
         String activeStr = req.getParameter("active");
         boolean active = "on".equals(activeStr) || "true".equals(activeStr);
 
-        if (title == null || title.trim().isEmpty()) {
+        // Chuẩn bị đối tượng tạm để giữ lại dữ liệu đã nhập nếu có lỗi validation
+        Video tempVideo = new Video();
+        tempVideo.setTitle(title != null ? title.trim() : "");
+        tempVideo.setDescription(description != null ? description.trim() : "");
+        tempVideo.setPoster(poster != null ? poster.trim() : "");
+        tempVideo.setUrl(url != null ? url.trim() : "");
+        tempVideo.setActive(active);
+
+        // 1. Kiểm tra tiêu đề bắt buộc
+        if (ValidationUtil.isEmpty(title)) {
             req.setAttribute("alert", "Tiêu đề video không được để trống!");
+            req.setAttribute("video", tempVideo);
+            req.setAttribute("isEdit", false);
+            req.getRequestDispatcher(Constant.Path.VIDEO_FORM).forward(req, resp);
+            return;
+        }
+
+        // 2. Kiểm tra độ dài tiêu đề
+        if (title.trim().length() < 3 || title.trim().length() > 255) {
+            req.setAttribute("alert", "Tiêu đề video phải có độ dài từ 3 đến 255 ký tự!");
+            req.setAttribute("video", tempVideo);
+            req.setAttribute("isEdit", false);
+            req.getRequestDispatcher(Constant.Path.VIDEO_FORM).forward(req, resp);
+            return;
+        }
+
+        // 3. Kiểm tra định dạng Poster URL (nếu có nhập)
+        if (!ValidationUtil.isEmpty(poster) && !ValidationUtil.isValidUrl(poster)) {
+            req.setAttribute("alert", "Đường dẫn ảnh thumbnail (Poster URL) không hợp lệ (phải bắt đầu bằng http:// hoặc https://)!");
+            req.setAttribute("video", tempVideo);
+            req.setAttribute("isEdit", false);
+            req.getRequestDispatcher(Constant.Path.VIDEO_FORM).forward(req, resp);
+            return;
+        }
+
+        // 4. Kiểm tra định dạng Video URL (nếu có nhập)
+        if (!ValidationUtil.isEmpty(url) && !ValidationUtil.isValidUrl(url)) {
+            req.setAttribute("alert", "Đường dẫn video (URL Link) không hợp lệ (phải bắt đầu bằng http:// hoặc https://)!");
+            req.setAttribute("video", tempVideo);
             req.setAttribute("isEdit", false);
             req.getRequestDispatcher(Constant.Path.VIDEO_FORM).forward(req, resp);
             return;
@@ -295,8 +333,60 @@ public class VideoController extends HttpServlet {
         String activeStr = req.getParameter("active");
         boolean active = "on".equals(activeStr) || "true".equals(activeStr);
 
+        int videoId = 0;
         try {
-            int videoId = Integer.parseInt(idStr);
+            videoId = Integer.parseInt(idStr);
+        } catch (Exception e) {
+            resp.sendRedirect(req.getContextPath() + "/video");
+            return;
+        }
+
+        // Tạo đối tượng tạm để giữ lại dữ liệu form khi có lỗi
+        Video tempVideo = new Video();
+        tempVideo.setVideoId(videoId);
+        tempVideo.setTitle(title != null ? title.trim() : "");
+        tempVideo.setDescription(description != null ? description.trim() : "");
+        tempVideo.setPoster(poster != null ? poster.trim() : "");
+        tempVideo.setUrl(url != null ? url.trim() : "");
+        tempVideo.setActive(active);
+
+        // 1. Kiểm tra tiêu đề bắt buộc
+        if (ValidationUtil.isEmpty(title)) {
+            req.setAttribute("alert", "Tiêu đề video không được để trống!");
+            req.setAttribute("video", tempVideo);
+            req.setAttribute("isEdit", true);
+            req.getRequestDispatcher(Constant.Path.VIDEO_FORM).forward(req, resp);
+            return;
+        }
+
+        // 2. Kiểm tra độ dài tiêu đề
+        if (title.trim().length() < 3 || title.trim().length() > 255) {
+            req.setAttribute("alert", "Tiêu đề video phải có độ dài từ 3 đến 255 ký tự!");
+            req.setAttribute("video", tempVideo);
+            req.setAttribute("isEdit", true);
+            req.getRequestDispatcher(Constant.Path.VIDEO_FORM).forward(req, resp);
+            return;
+        }
+
+        // 3. Kiểm tra định dạng Poster URL
+        if (!ValidationUtil.isEmpty(poster) && !ValidationUtil.isValidUrl(poster)) {
+            req.setAttribute("alert", "Đường dẫn ảnh thumbnail (Poster URL) không hợp lệ (phải bắt đầu bằng http:// hoặc https://)!");
+            req.setAttribute("video", tempVideo);
+            req.setAttribute("isEdit", true);
+            req.getRequestDispatcher(Constant.Path.VIDEO_FORM).forward(req, resp);
+            return;
+        }
+
+        // 4. Kiểm tra định dạng Video URL
+        if (!ValidationUtil.isEmpty(url) && !ValidationUtil.isValidUrl(url)) {
+            req.setAttribute("alert", "Đường dẫn video (URL Link) không hợp lệ (phải bắt đầu bằng http:// hoặc https://)!");
+            req.setAttribute("video", tempVideo);
+            req.setAttribute("isEdit", true);
+            req.getRequestDispatcher(Constant.Path.VIDEO_FORM).forward(req, resp);
+            return;
+        }
+
+        try {
             Video video = videoService.findById(videoId);
             if (video != null) {
                 video.setTitle(title != null ? title.trim() : "");

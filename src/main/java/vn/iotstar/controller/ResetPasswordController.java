@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpSession;
 import vn.iotstar.service.UserService;
 import vn.iotstar.service.impl.UserServiceImpl;
 import vn.iotstar.util.Constant;
+import vn.iotstar.util.ValidationUtil;
 
 import java.io.IOException;
 
@@ -52,22 +53,28 @@ public class ResetPasswordController extends HttpServlet {
 
         req.setAttribute("email", email);
 
-        if (email == null || email.trim().isEmpty()
-                || otp == null || otp.trim().isEmpty()
-                || newPassword == null || newPassword.trim().isEmpty()) {
+        if (ValidationUtil.isEmpty(email)
+                || ValidationUtil.isEmpty(otp)
+                || ValidationUtil.isEmpty(newPassword)) {
             req.setAttribute("alert", "Vui lòng nhập đầy đủ mã OTP và mật khẩu mới!");
             req.getRequestDispatcher(Constant.Path.RESET_PASSWORD).forward(req, resp);
             return;
         }
 
-        if (confirmPassword != null && !newPassword.equals(confirmPassword)) {
-            req.setAttribute("alert", "Mật khẩu xác nhận không khớp!");
+        if (!ValidationUtil.isValidOtp(otp)) {
+            req.setAttribute("alert", "Mã OTP không hợp lệ! Vui lòng nhập đúng 6 chữ số.");
             req.getRequestDispatcher(Constant.Path.RESET_PASSWORD).forward(req, resp);
             return;
         }
 
-        if (newPassword.length() < 6) {
+        if (!ValidationUtil.isValidPassword(newPassword)) {
             req.setAttribute("alert", "Mật khẩu mới phải có độ dài ít nhất 6 ký tự!");
+            req.getRequestDispatcher(Constant.Path.RESET_PASSWORD).forward(req, resp);
+            return;
+        }
+
+        if (confirmPassword == null || !newPassword.equals(confirmPassword)) {
+            req.setAttribute("alert", "Mật khẩu xác nhận không khớp với mật khẩu mới!");
             req.getRequestDispatcher(Constant.Path.RESET_PASSWORD).forward(req, resp);
             return;
         }

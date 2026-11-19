@@ -73,37 +73,77 @@
                 <small class="text-muted">Mã có hiệu lực trong vòng <strong>5 phút</strong>.</small>
             </div>
 
-            <form action="${pageContext.request.contextPath}/reset-password" method="post">
+            <form action="${pageContext.request.contextPath}/reset-password" method="post" class="needs-validation" novalidate id="resetForm">
                 <input type="hidden" name="email" value="${email}">
 
                 <div class="mb-3">
-                    <label class="form-label fw-semibold text-secondary small">MÃ XÁC THỰC OTP (6 SỐ):</label>
-                    <input type="text" class="form-control form-control-lg otp-input" name="otp" 
-                           placeholder="------" maxlength="6" pattern="[0-9]{6}" required autofocus>
+                    <label class="form-label fw-semibold text-secondary small">MÃ XÁC THỰC OTP (ĐÚNG 6 SỐ) *</label>
+                    <div class="has-validation">
+                        <input type="text" class="form-control form-control-lg otp-input" name="otp" 
+                               placeholder="------" maxlength="6" pattern="[0-9]{6}" required autofocus>
+                        <div class="invalid-feedback text-center">
+                            Vui lòng nhập đúng 6 chữ số mã OTP.
+                        </div>
+                    </div>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label fw-semibold text-secondary small">MẬT KHẨU MỚI (TỐI THIỂU 6 KÝ TỰ):</label>
-                    <div class="input-group">
+                    <label class="form-label fw-semibold text-secondary small">MẬT KHẨU MỚI (TỐI THIỂU 6 KÝ TỰ) *</label>
+                    <div class="input-group has-validation">
                         <span class="input-group-text bg-light"><i class="bi bi-key"></i></span>
-                        <input type="password" class="form-control" name="newPassword" 
+                        <input type="password" class="form-control" name="newPassword" id="newPassword"
                                placeholder="Nhập mật khẩu mới" minlength="6" required>
+                        <div class="invalid-feedback">
+                            Mật khẩu mới phải có tối thiểu 6 ký tự.
+                        </div>
                     </div>
                 </div>
 
                 <div class="mb-4">
-                    <label class="form-label fw-semibold text-secondary small">XÁC NHẬN MẬT KHẨU MỚI:</label>
-                    <div class="input-group">
+                    <label class="form-label fw-semibold text-secondary small">XÁC NHẬN MẬT KHẨU MỚI *</label>
+                    <div class="input-group has-validation">
                         <span class="input-group-text bg-light"><i class="bi bi-shield-check"></i></span>
-                        <input type="password" class="form-control" name="confirmPassword" 
+                        <input type="password" class="form-control" name="confirmPassword" id="confirmPassword"
                                placeholder="Nhập lại mật khẩu mới" minlength="6" required>
+                        <div class="invalid-feedback" id="resetConfirmFeedback">
+                            Mật khẩu xác nhận không khớp!
+                        </div>
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold shadow-sm">
                     <i class="bi bi-check2-circle me-1"></i>Cập nhật mật khẩu mới
                 </button>
             </form>
+
+            <script>
+                (() => {
+                    'use strict';
+                    const form = document.getElementById('resetForm');
+                    const newPwd = document.getElementById('newPassword');
+                    const confirmPwd = document.getElementById('confirmPassword');
+
+                    function validateMatch() {
+                        if (confirmPwd.value !== newPwd.value) {
+                            confirmPwd.setCustomValidity('Mật khẩu xác nhận không khớp');
+                        } else {
+                            confirmPwd.setCustomValidity('');
+                        }
+                    }
+
+                    newPwd.addEventListener('input', validateMatch);
+                    confirmPwd.addEventListener('input', validateMatch);
+
+                    form.addEventListener('submit', event => {
+                        validateMatch();
+                        if (!form.checkValidity()) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                })();
+            </script>
 
             <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
                 <a href="${pageContext.request.contextPath}/resend-forgot-otp?email=${email}" class="text-decoration-none small text-primary fw-semibold">

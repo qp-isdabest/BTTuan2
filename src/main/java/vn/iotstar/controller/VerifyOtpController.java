@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpSession;
 import vn.iotstar.service.UserService;
 import vn.iotstar.service.impl.UserServiceImpl;
 import vn.iotstar.util.Constant;
+import vn.iotstar.util.ValidationUtil;
 
 import java.io.IOException;
 
@@ -65,8 +66,14 @@ public class VerifyOtpController extends HttpServlet {
 
         req.setAttribute("email", email);
 
-        if (email == null || email.trim().isEmpty() || otp == null || otp.trim().isEmpty()) {
+        if (ValidationUtil.isEmpty(email) || ValidationUtil.isEmpty(otp)) {
             req.setAttribute("alert", "Vui lòng nhập đầy đủ mã OTP!");
+            req.getRequestDispatcher(Constant.Path.VERIFY_OTP).forward(req, resp);
+            return;
+        }
+
+        if (!ValidationUtil.isValidOtp(otp)) {
+            req.setAttribute("alert", "Mã OTP không hợp lệ! Vui lòng nhập đúng 6 chữ số.");
             req.getRequestDispatcher(Constant.Path.VERIFY_OTP).forward(req, resp);
             return;
         }
