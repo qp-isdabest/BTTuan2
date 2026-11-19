@@ -36,8 +36,6 @@
 </head>
 <body>
 
-<jsp:include page="topbar.jsp" />
-
 <div class="container">
     <div class="form-card">
         <div class="form-header">

@@ -14,8 +14,6 @@
 </head>
 <body class="bg-light">
 
-<jsp:include page="topbar.jsp" />
-
 <div class="container py-4">
     <!-- Header & Action -->
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom gap-2">

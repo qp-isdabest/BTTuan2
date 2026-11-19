@@ -14,8 +14,6 @@
 </head>
 <body class="bg-light">
 
-<jsp:include page="topbar.jsp" />
-
 <div class="container py-4">
     <!-- Welcome Header -->
     <div class="p-4 p-md-5 mb-4 rounded-3 text-white bg-primary shadow-sm">

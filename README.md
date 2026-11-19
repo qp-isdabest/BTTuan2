@@ -49,8 +49,13 @@ Dự án tuân thủ nghiêm ngặt mô hình chuẩn theo bài giảng slide:
 │       └── EmailUtil.java                      # Tiện ích gửi Email HTML chứa mã OTP qua Jakarta Mail
 └── src/main/webapp/
     ├── WEB-INF/
-    │   ├── web.xml                             # Deployment Descriptor
-    │   └── views/                              # TẦNG 1: PRESENTATION LAYER (Views)
+    │   ├── web.xml                             # Cấu hình Deployment Descriptor & SiteMesh 3 Filter
+    │   ├── sitemesh3.xml                       # Tệp cấu hình phân định Decorator Mapping của SiteMesh 3
+    │   ├── decorators/                         # Bộ giao diện mẫu Bootstrap 5 dùng chung (SiteMesh 3 Decorators)
+    │   │   ├── web.jsp                         # Decorator tổng thể (<sitemesh:write property='body|head|title'/>)
+    │   │   ├── header.jsp                      # Thanh điều hướng Navbar Bootstrap 5 responsive
+    │   │   └── footer.jsp                      # Chân trang Bootstrap 5 chuyên nghiệp & thông tin sinh viên
+    │   └── views/                              # TẦNG 1: PRESENTATION LAYER (Nội dung từng trang JSP)
     │       ├── topbar.jsp                      # Header / Thanh điều hướng dùng chung
     │       ├── video_list.jsp                  # Giao diện Danh sách Video + Tìm kiếm (READ)
     │       ├── video_form.jsp                  # Giao diện Form thêm mới & chỉnh sửa Video (CREATE / UPDATE)
@@ -77,7 +82,53 @@ Dự án tuân thủ nghiêm ngặt mô hình chuẩn theo bài giảng slide:
 
 ---
 
-## 3. Các tính năng cốt lõi khác
+## 3. Cấu hình Sitemesh Decorator 3 với Template Bootstrap 5
+
+Dự án đã tích hợp đầy đủ công nghệ **SiteMesh 3 Decorator** kết hợp **Bootstrap 5.3.3**:
+
+### 3.1. Thư viện Maven (`pom.xml`)
+Sử dụng SiteMesh phiên bản **3.3.0** hỗ trợ tương thích hoàn toàn chuẩn **Jakarta EE 10 / Jakarta Servlet 6.0** (Tomcat 11):
+```xml
+<dependency>
+    <groupId>org.sitemesh</groupId>
+    <artifactId>sitemesh</artifactId>
+    <version>3.3.0</version>
+</dependency>
+```
+
+### 3.2. Cấu hình Filter (`web.xml`)
+Khai báo `ConfigurableSiteMeshFilter` đón bắt tất cả request và forward:
+```xml
+<filter>
+    <filter-name>sitemesh</filter-name>
+    <filter-class>org.sitemesh.config.ConfigurableSiteMeshFilter</filter-class>
+</filter>
+<filter-mapping>
+    <filter-name>sitemesh</filter-name>
+    <url-pattern>/*</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+    <dispatcher>FORWARD</dispatcher>
+</filter-mapping>
+```
+
+### 3.3. Tệp định tuyến Decorator (`sitemesh3.xml`)
+Định cấu hình decorator chính và loại trừ tài nguyên tĩnh:
+```xml
+<sitemesh>
+    <mapping path="/*" decorator="/WEB-INF/decorators/web.jsp" />
+    <mapping path="/static/*" exclude="true" />
+    <mapping path="/assets/*" exclude="true" />
+</sitemesh>
+```
+
+### 3.4. Cấu trúc Template Decorator Bootstrap (`WEB-INF/decorators/`)
+* **`web.jsp`**: Khung sườn HTML5 chuẩn, tích hợp CDN Bootstrap 5.3.3 & Bootstrap Icons, sử dụng các thẻ `<sitemesh:write property='title'/>`, `<sitemesh:write property='head'/>`, `<sitemesh:write property='body'/>`.
+* **`header.jsp`**: Thanh điều hướng Navbar Bootstrap với hiệu ứng responsive, menu phân quyền (Admin / Manager / User) và dropdown hồ sơ người dùng.
+* **`footer.jsp`**: Chân trang Bootstrap 5 hiện đại (Sticky footer), hiển thị đầy đủ thông tin sinh viên (**Phan Thế Quân - MSSV: 24110050**) cùng các nhãn công nghệ Jakarta EE, Hibernate, SiteMesh 3.
+
+---
+
+## 4. Các tính năng cốt lõi khác
 
 1. **Mối quan hệ 1 - N (Users & Videos):** Bảng `videos` chứa khóa ngoại `user_id` tham chiếu tới khóa chính của bảng `users`.
 2. **Quên mật khẩu gửi OTP qua Email:** Tự động sinh OTP 6 số (5 phút), gửi mail HTML, cập nhật mật khẩu băm BCrypt.

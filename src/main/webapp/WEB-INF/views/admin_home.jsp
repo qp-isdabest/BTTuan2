@@ -13,8 +13,6 @@
 </head>
 <body class="bg-light">
 
-<jsp:include page="topbar.jsp" />
-
 <div class="container py-4">
     <!-- Header Admin -->
     <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">

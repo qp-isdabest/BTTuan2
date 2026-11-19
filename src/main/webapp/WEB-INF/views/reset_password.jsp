@@ -42,8 +42,6 @@
 </head>
 <body>
 
-<jsp:include page="topbar.jsp" />
-
 <div class="container">
     <div class="reset-card">
         <div class="reset-header">

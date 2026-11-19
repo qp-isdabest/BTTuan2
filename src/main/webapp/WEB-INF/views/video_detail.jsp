@@ -36,8 +36,6 @@
 </head>
 <body class="bg-light">
 
-<jsp:include page="topbar.jsp" />
-
 <div class="container py-4">
     <!-- Breadcrumb điều hướng -->
     <nav aria-label="breadcrumb" class="mb-3">

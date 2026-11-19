@@ -39,8 +39,6 @@
 </head>
 <body>
 
-<jsp:include page="topbar.jsp" />
-
 <div class="container">
     <div class="login-card">
         <div class="login-header">

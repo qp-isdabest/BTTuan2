@@ -42,8 +42,6 @@
 </head>
 <body>
 
-<jsp:include page="topbar.jsp" />
-
 <div class="container">
     <div class="otp-card">
         <div class="otp-header">

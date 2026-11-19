@@ -36,8 +36,6 @@
 </head>
 <body>
 
-<jsp:include page="topbar.jsp" />
-
 <div class="container">
     <div class="register-card">
         <div class="register-header">

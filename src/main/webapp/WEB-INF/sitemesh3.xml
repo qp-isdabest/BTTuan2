@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemesh>
+    <!-- Cấu hình Decorator mặc định dùng Bootstrap 5 cho toàn bộ các trang -->
+    <mapping path="/*" decorator="/WEB-INF/decorators/web.jsp" />
+
+    <!-- Loại trừ các tài nguyên tĩnh không xử lý qua decorator -->
+    <mapping path="/static/*" exclude="true" />
+    <mapping path="/assets/*" exclude="true" />
+    <mapping path="/css/*" exclude="true" />
+    <mapping path="/js/*" exclude="true" />
+    <mapping path="/images/*" exclude="true" />
+</sitemesh>
